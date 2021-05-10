@@ -7,7 +7,7 @@ public class PlayerCar : MonoBehaviour
 {
     Camera myCamera;
     Rigidbody myRigidbody;
-    float speed = 10000f;
+    float speedAddition = 1000f;
     float currentSpeed = 0f;
     float rotationSpeed = 150f;
     float cameraSpeed = 400f;
@@ -55,27 +55,48 @@ public class PlayerCar : MonoBehaviour
         myCamera = FindObjectOfType<Camera>();
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
         //myCamera.transform.rotation = transform.rotation;
+        InvokeRepeating("CheckGas", 0.1f, 0.5f);
     }
 
     // Update is called once per frame
 
-    void Slow()
+    void CheckGas()
     {
+        float reverseMax = -7500, gasMax = 15000;
+        if (gasAmount > 0.2f && currentSpeed < gasMax)
+            currentSpeed += speedAddition * gasAmount;
+        else if (reverseAmount > 0.2f && currentSpeed > reverseMax)
+            currentSpeed -= speedAddition * reverseAmount * 2;
+        else if (currentSpeed > 0)
+        {
+            currentSpeed -= speedAddition / 5;
+            if (currentSpeed <= speedAddition) currentSpeed = 0;
+        }
 
+        else
+        {
+            if (currentSpeed < 0) currentSpeed += speedAddition / 5;
+            if (currentSpeed >= speedAddition) currentSpeed = 0;
+        }
+        
     }
 
     void Update()
     {
-        gas = gasAmount > 0.15f;
-        reverse = reverseAmount > 0.15f;
+        gas = gasAmount > 0.2f;
+        reverse = reverseAmount > 0.2f;
 
-        if (myRigidbody.velocity != Vector3.zero)
+        if (currentSpeed != 0)
+            transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
+        myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
+
+        /*if (myRigidbody.velocity != Vector3.zero)
         {
             
             if (gas)
             {
                 transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-                myRigidbody.velocity = transform.forward * (gasAmount) * speed * Time.deltaTime;
+                myRigidbody.velocity = transform.forward * (gasAmount) * speedAddition * Time.deltaTime;
             }
             else
             {
@@ -92,7 +113,7 @@ public class PlayerCar : MonoBehaviour
                 else
                 {
                     transform.Rotate(Vector3.up * -direction.x * rotationSpeed * Time.deltaTime);
-                    myRigidbody.velocity = transform.forward * (reverseAmount) * -speed * Time.deltaTime;
+                    myRigidbody.velocity = transform.forward * (reverseAmount) * -speedAddition * Time.deltaTime;
                 }
 
             }
@@ -102,13 +123,13 @@ public class PlayerCar : MonoBehaviour
             if (gas)
             {
                 //transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-                myRigidbody.velocity += transform.forward * (gasAmount) * speed * Time.deltaTime;
+                myRigidbody.velocity += transform.forward * (gasAmount) * speedAddition * Time.deltaTime;
             }
             if (reverse)
             {
-                myRigidbody.velocity += transform.forward * (reverseAmount) * -speed * Time.deltaTime;
+                myRigidbody.velocity += transform.forward * (reverseAmount) * -speedAddition * Time.deltaTime;
             }
-        }
+        }/*
 
             /*if (gasAmount > 0)
         {
@@ -167,7 +188,7 @@ public class PlayerCar : MonoBehaviour
     void Gas()
     {
         //gas = true;
-        myRigidbody.velocity = transform.forward * speed * Time.deltaTime;
+        myRigidbody.velocity = transform.forward * speedAddition * Time.deltaTime;
         
     }
 
@@ -205,7 +226,7 @@ public class PlayerCar : MonoBehaviour
     void Reverse()
     {
         //gas = false;
-        myRigidbody.velocity = transform.forward * -speed * Time.deltaTime;
+        myRigidbody.velocity = transform.forward * -speedAddition * Time.deltaTime;
     }
 
     void Stop()
