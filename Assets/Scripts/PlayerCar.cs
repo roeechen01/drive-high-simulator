@@ -9,7 +9,7 @@ public class PlayerCar : MonoBehaviour
     Rigidbody myRigidbody;
     float speedAddition = 1000f;
     float currentSpeed = 0f;
-    float rotationSpeed = 150f;
+    float rotationSpeed = 125f;
     float cameraSpeed = 400f;
     PlayerControls controls;
     Vector2 direction;
@@ -18,6 +18,8 @@ public class PlayerCar : MonoBehaviour
     float reverseAmount;
     public bool build = false;
     public float buildDifference = 6.5f;
+    AudioSource audioSource;
+    //AudioClip audioClip;
 
     private void Awake()
     {
@@ -40,23 +42,27 @@ public class PlayerCar : MonoBehaviour
 
         controls.Gameplay.Quit.performed += ctx => Application.Quit();
 
+        controls.Gameplay.VolUp.performed += ctx => audioSource.volume += 0.1f;
+        controls.Gameplay.VolDown.performed += ctx => audioSource.volume -= 0.1f;
+
 
     }
 
     void Start()
     {
+        audioSource = GetComponent<AudioSource>();
+        audioSource.volume = 0.5f;
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
         InvokeRepeating("CheckPedals", 0.1f, 0.5f);
         if (build)
-            speedAddition /= buildDifference                ;
+            speedAddition /= buildDifference;
         else buildDifference = 1;
     }
 
     void CheckPedals()
     {
-        print(gasAmount + ", " + reverseAmount);
         float reverseMax = -7500 / buildDifference, gasMax = 15000 / buildDifference;
         if (gasAmount > 0.2f && currentSpeed < gasMax)
             currentSpeed += speedAddition * gasAmount;

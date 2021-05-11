@@ -60,6 +60,38 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "Press(pressPoint=0.1)"
+                },
+                {
+                    "name": "NextChannel",
+                    "type": "Button",
+                    "id": "e2a52324-1703-43e6-8ab7-d95087237abb",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "PreviousChannel",
+                    "type": "Button",
+                    "id": "fcaf3065-5fea-4f15-8816-6c05fbaaa0ae",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "VolUp",
+                    "type": "Button",
+                    "id": "5e1b02a0-50fc-45dc-a852-8fee764bd0c1",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
+                    "name": "VolDown",
+                    "type": "Button",
+                    "id": "0898368a-936c-4999-b9c9-5d428e5e8fc9",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -137,6 +169,50 @@
                     "processors": "",
                     "groups": "",
                     "action": "Quit",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "66e01ac7-f0e3-4af4-a48f-3a619b83dccf",
+                    "path": "<Gamepad>/dpad/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "NextChannel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "eebddb7f-0382-4f25-a5ed-45b949dc47fe",
+                    "path": "<Gamepad>/dpad/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PreviousChannel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "530de455-7465-4b75-ab4a-7de5533ed2a4",
+                    "path": "<Gamepad>/dpad/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "VolUp",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e07d83ca-5d20-48af-8042-7008f2e845cb",
+                    "path": "<Gamepad>/dpad/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "VolDown",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
