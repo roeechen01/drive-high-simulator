@@ -19,7 +19,7 @@ public class PlayerCar : MonoBehaviour
     public bool build = false;
     public float buildDifference = 6.5f;
     AudioSource audioSource;
-    float time = 3900f;
+    float time = 0f;
     public AudioClip[] radioStations;
     int stationIndex = 0;
 
@@ -77,27 +77,18 @@ public class PlayerCar : MonoBehaviour
     void PlayStation(int index, float time)
     {
         float stationLength = radioStations[stationIndex].length;
+        audioSource.time = 0;
         audioSource.clip = radioStations[index];
-        audioSource.Play();
-        if(time < radioStations[stationIndex].length)
+        if(time < stationLength)
             audioSource.time = time;
         else
         {
-            float stationTime = 0f;
             float timeCopy = time;
-            bool flag = true;
-            while (!flag)
-            {
-                if (timeCopy - stationLength < stationLength)
-                {
-                    flag = false;
-                    stationTime = timeCopy - stationLength;
-                }
-                else
-                    timeCopy -= stationLength;
-            }
-            audioSource.time = stationTime;
+            while (timeCopy > stationLength)
+                timeCopy -= stationLength;
+            audioSource.time = timeCopy;
         }
+        audioSource.Play();
     }
 
 
@@ -107,12 +98,18 @@ public class PlayerCar : MonoBehaviour
         InvokeRepeating("Timer", 0f, 0.1f);
         audioSource = GetComponent<AudioSource>();
         audioSource.volume = 0.5f;
-        time = Random.Range(0, radioStations[stationIndex].length);
+        float maxLength = 0f;
+        for (int i = 0; i < radioStations.Length; i++)
+            if (radioStations[i].length > maxLength)
+                maxLength = radioStations[i].length;
+        time = Random.Range(0, maxLength);
         PlayStation(stationIndex, time);
+
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
         InvokeRepeating("CheckPedals", 0.1f, 0.5f);
+
         if (build)
             speedAddition /= buildDifference;
         else buildDifference = 1;
