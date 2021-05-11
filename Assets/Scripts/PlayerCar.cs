@@ -16,19 +16,16 @@ public class PlayerCar : MonoBehaviour
     Vector2 view;
     float gasAmount;
     float reverseAmount;
-    bool gas = true;
-    bool reverse = true;
+    public bool build = false;
+    public float buildDifference = 6.5f;
 
     private void Awake()
     {
         controls = new PlayerControls();
 
         controls.Gameplay.Gas.performed += ctx => gasAmount = ctx.ReadValue<float>();
-        //controls.Gameplay.Gas.performed += ctx => Gas();
-        controls.Gameplay.Gas.canceled += ctx => Stop();
 
         controls.Gameplay.Reverse.performed += ctx => reverseAmount = ctx.ReadValue<float>();
-        controls.Gameplay.Reverse.canceled += ctx => Stop();
 
         controls.Gameplay.Move.performed += ctx => direction = ctx.ReadValue<Vector2>();
         controls.Gameplay.Move.canceled += ctx => direction = Vector2.zero;
@@ -46,27 +43,30 @@ public class PlayerCar : MonoBehaviour
 
     }
 
-    // Start is called before the first frame update
     void Start()
     {
-        //if (Input.GetKeyDown(KeyCode.Escape))
-            //Application.Quit();
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
-        //myCamera.transform.rotation = transform.rotation;
-        InvokeRepeating("CheckGas", 0.1f, 0.5f);
+        InvokeRepeating("CheckPedals", 0.1f, 0.5f);
+        if (build)
+            speedAddition /= buildDifference                ;
+        else buildDifference = 1;
     }
 
-    // Update is called once per frame
-
-    void CheckGas()
+    void CheckPedals()
     {
-        float reverseMax = -7500, gasMax = 15000;
+        print(gasAmount + ", " + reverseAmount);
+        float reverseMax = -7500 / buildDifference, gasMax = 15000 / buildDifference;
         if (gasAmount > 0.2f && currentSpeed < gasMax)
             currentSpeed += speedAddition * gasAmount;
         else if (reverseAmount > 0.2f && currentSpeed > reverseMax)
-            currentSpeed -= speedAddition * reverseAmount * 2;
+        {
+            if(currentSpeed > 0)
+                currentSpeed -= speedAddition * reverseAmount * 2;
+            else currentSpeed -= speedAddition * reverseAmount;
+        }
+            
         else if (currentSpeed > 0)
         {
             currentSpeed -= speedAddition / 5;
@@ -75,104 +75,25 @@ public class PlayerCar : MonoBehaviour
 
         else
         {
-            if (currentSpeed < 0) currentSpeed += speedAddition / 5;
-            if (currentSpeed >= speedAddition) currentSpeed = 0;
+            if (currentSpeed < 0)
+            {
+                currentSpeed += speedAddition / 5;
+                if (currentSpeed >= speedAddition) currentSpeed = 0;
+            }
         }
-        
     }
 
     void Update()
     {
-        gas = gasAmount > 0.2f;
-        reverse = reverseAmount > 0.2f;
-
         if (currentSpeed != 0)
             transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
         myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
-
-        /*if (myRigidbody.velocity != Vector3.zero)
-        {
-            
-            if (gas)
-            {
-                transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-                myRigidbody.velocity = transform.forward * (gasAmount) * speedAddition * Time.deltaTime;
-            }
-            else
-            {
-               
-                if (!reverse)
-                {
-                    //myRigidbody.velocity *= 0.5f;
-                    //myRigidbody.velocity = transform.forward * Time.deltaTime * speed;
-                    //myRigidbody.velocity += -transform.forward;
-                    //if (myRigidbody.velocity.magnitude < 1)
-                    
-                    myRigidbody.velocity = Vector3.zero;
-                }
-                else
-                {
-                    transform.Rotate(Vector3.up * -direction.x * rotationSpeed * Time.deltaTime);
-                    myRigidbody.velocity = transform.forward * (reverseAmount) * -speedAddition * Time.deltaTime;
-                }
-
-            }
-        }
-        else
-        {
-            if (gas)
-            {
-                //transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-                myRigidbody.velocity += transform.forward * (gasAmount) * speedAddition * Time.deltaTime;
-            }
-            if (reverse)
-            {
-                myRigidbody.velocity += transform.forward * (reverseAmount) * -speedAddition * Time.deltaTime;
-            }
-        }/*
-
-            /*if (gasAmount > 0)
-        {
-            transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-            myRigidbody.velocity += transform.forward * (gasAmount * 1f) * speed * Time.deltaTime;
-
-        }
-        else if (breaksAmount == 0)
-        {
-            //print("Entered: " + myRigidbody.velocity);
-            if (myRigidbody.velocity != Vector3.zero)
-            {
-                transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-                //myRigidbody.velocity -= transform.forward * 1000f * Time.deltaTime;
-                myRigidbody.velocity /= 2f * Time.deltaTime;
-                //print("Entered: " + myRigidbody.velocity);
-            }
-        }*/
-
-        if (myRigidbody.velocity != Vector3.zero)
-        {
-            //if (gas)
-            //{
-                //transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-                //myRigidbody.velocity = transform.forward * Time.deltaTime; 
-            //}
-            //else
-            //{
-                //transform.Rotate(Vector3.up * -direction.x * rotationSpeed * Time.deltaTime);
-                //myRigidbody.velocity = transform.forward * -speed * Time.deltaTime;
-            //}
-        }
         
         if(view != Vector2.zero)
         {
             myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);//for one direction viewing
             //myCamera.transform.Rotate(new Vector3(view.y, view.x, 0) * cameraSpeed * Time.deltaTime);//for two directions viewing
         }
-
-        
-
-
-
     }
 
     private void OnEnable()
@@ -185,13 +106,6 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.Disable();
     }
 
-    void Gas()
-    {
-        //gas = true;
-        myRigidbody.velocity = transform.forward * speedAddition * Time.deltaTime;
-        
-    }
-
     void ResetCamera()
     {
         myCamera.transform.rotation = transform.rotation;
@@ -200,38 +114,6 @@ public class PlayerCar : MonoBehaviour
     void ReverseCamera()
     {
         myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
-        print("called");
-    }
-
-    /*void Repeat()
-    {
-        if (myRigidbody.velocity != Vector3.zero)
-        {
-            if (gas)
-            {
-                transform.Rotate(Vector3.up * direction2.x * rotationSpeed * Time.deltaTime);
-                myRigidbody.velocity = transform.forward * speed * Time.deltaTime;
-            }
-            else
-            {
-                transform.Rotate(Vector3.up * -direction2.x * rotationSpeed * Time.deltaTime);
-                myRigidbody.velocity = transform.forward * -speed * Time.deltaTime;
-            }
-        }
-        else CancelInvoke("Repeat");
-        print(direction2);
-            
-    }*/
-
-    void Reverse()
-    {
-        //gas = false;
-        myRigidbody.velocity = transform.forward * -speedAddition * Time.deltaTime;
-    }
-
-    void Stop()
-    {
-        myRigidbody.velocity = Vector3.zero;
     }
 
     /*void Movement()
@@ -253,7 +135,7 @@ public class PlayerCar : MonoBehaviour
         {
             myRigidbody.velocity = Vector3.zero;
         }
-    }*/
+    }
 
     void ControlRotation()
     {
@@ -266,7 +148,5 @@ public class PlayerCar : MonoBehaviour
         {
             transform.Rotate(Vector3.up * rotationSpeed);
         }
-        
-
-    }
+    }*/
 }
