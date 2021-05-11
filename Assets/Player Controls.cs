@@ -75,7 +75,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""interactions"": ""Press(pressPoint=0.1)""
                 },
                 {
-                    ""name"": ""NextChannel"",
+                    ""name"": ""NextStation"",
                     ""type"": ""Button"",
                     ""id"": ""e2a52324-1703-43e6-8ab7-d95087237abb"",
                     ""expectedControlType"": ""Button"",
@@ -83,7 +83,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""interactions"": """"
                 },
                 {
-                    ""name"": ""PreviousChannel"",
+                    ""name"": ""PreviousStation"",
                     ""type"": ""Button"",
                     ""id"": ""fcaf3065-5fea-4f15-8816-6c05fbaaa0ae"",
                     ""expectedControlType"": ""Button"",
@@ -96,7 +96,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""id"": ""5e1b02a0-50fc-45dc-a852-8fee764bd0c1"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """"
+                    ""interactions"": ""Press(pressPoint=0.1)""
                 },
                 {
                     ""name"": ""VolDown"",
@@ -104,7 +104,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""id"": ""0898368a-936c-4999-b9c9-5d428e5e8fc9"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
-                    ""interactions"": """"
+                    ""interactions"": ""Press(pressPoint=0.1)""
                 }
             ],
             ""bindings"": [
@@ -192,7 +192,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""NextChannel"",
+                    ""action"": ""NextStation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -203,7 +203,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""PreviousChannel"",
+                    ""action"": ""PreviousStation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -243,8 +243,8 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         m_Gameplay_ResetCamera = m_Gameplay.FindAction("ResetCamera", throwIfNotFound: true);
         m_Gameplay_ReverseCamera = m_Gameplay.FindAction("ReverseCamera", throwIfNotFound: true);
         m_Gameplay_Quit = m_Gameplay.FindAction("Quit", throwIfNotFound: true);
-        m_Gameplay_NextChannel = m_Gameplay.FindAction("NextChannel", throwIfNotFound: true);
-        m_Gameplay_PreviousChannel = m_Gameplay.FindAction("PreviousChannel", throwIfNotFound: true);
+        m_Gameplay_NextStation = m_Gameplay.FindAction("NextStation", throwIfNotFound: true);
+        m_Gameplay_PreviousStation = m_Gameplay.FindAction("PreviousStation", throwIfNotFound: true);
         m_Gameplay_VolUp = m_Gameplay.FindAction("VolUp", throwIfNotFound: true);
         m_Gameplay_VolDown = m_Gameplay.FindAction("VolDown", throwIfNotFound: true);
     }
@@ -303,8 +303,8 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_ResetCamera;
     private readonly InputAction m_Gameplay_ReverseCamera;
     private readonly InputAction m_Gameplay_Quit;
-    private readonly InputAction m_Gameplay_NextChannel;
-    private readonly InputAction m_Gameplay_PreviousChannel;
+    private readonly InputAction m_Gameplay_NextStation;
+    private readonly InputAction m_Gameplay_PreviousStation;
     private readonly InputAction m_Gameplay_VolUp;
     private readonly InputAction m_Gameplay_VolDown;
     public struct GameplayActions
@@ -318,8 +318,8 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         public InputAction @ResetCamera => m_Wrapper.m_Gameplay_ResetCamera;
         public InputAction @ReverseCamera => m_Wrapper.m_Gameplay_ReverseCamera;
         public InputAction @Quit => m_Wrapper.m_Gameplay_Quit;
-        public InputAction @NextChannel => m_Wrapper.m_Gameplay_NextChannel;
-        public InputAction @PreviousChannel => m_Wrapper.m_Gameplay_PreviousChannel;
+        public InputAction @NextStation => m_Wrapper.m_Gameplay_NextStation;
+        public InputAction @PreviousStation => m_Wrapper.m_Gameplay_PreviousStation;
         public InputAction @VolUp => m_Wrapper.m_Gameplay_VolUp;
         public InputAction @VolDown => m_Wrapper.m_Gameplay_VolDown;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
@@ -352,12 +352,12 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @Quit.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnQuit;
                 @Quit.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnQuit;
                 @Quit.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnQuit;
-                @NextChannel.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnNextChannel;
-                @NextChannel.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnNextChannel;
-                @NextChannel.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnNextChannel;
-                @PreviousChannel.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPreviousChannel;
-                @PreviousChannel.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPreviousChannel;
-                @PreviousChannel.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPreviousChannel;
+                @NextStation.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnNextStation;
+                @NextStation.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnNextStation;
+                @NextStation.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnNextStation;
+                @PreviousStation.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPreviousStation;
+                @PreviousStation.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPreviousStation;
+                @PreviousStation.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPreviousStation;
                 @VolUp.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnVolUp;
                 @VolUp.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnVolUp;
                 @VolUp.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnVolUp;
@@ -389,12 +389,12 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @Quit.started += instance.OnQuit;
                 @Quit.performed += instance.OnQuit;
                 @Quit.canceled += instance.OnQuit;
-                @NextChannel.started += instance.OnNextChannel;
-                @NextChannel.performed += instance.OnNextChannel;
-                @NextChannel.canceled += instance.OnNextChannel;
-                @PreviousChannel.started += instance.OnPreviousChannel;
-                @PreviousChannel.performed += instance.OnPreviousChannel;
-                @PreviousChannel.canceled += instance.OnPreviousChannel;
+                @NextStation.started += instance.OnNextStation;
+                @NextStation.performed += instance.OnNextStation;
+                @NextStation.canceled += instance.OnNextStation;
+                @PreviousStation.started += instance.OnPreviousStation;
+                @PreviousStation.performed += instance.OnPreviousStation;
+                @PreviousStation.canceled += instance.OnPreviousStation;
                 @VolUp.started += instance.OnVolUp;
                 @VolUp.performed += instance.OnVolUp;
                 @VolUp.canceled += instance.OnVolUp;
@@ -414,8 +414,8 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         void OnResetCamera(InputAction.CallbackContext context);
         void OnReverseCamera(InputAction.CallbackContext context);
         void OnQuit(InputAction.CallbackContext context);
-        void OnNextChannel(InputAction.CallbackContext context);
-        void OnPreviousChannel(InputAction.CallbackContext context);
+        void OnNextStation(InputAction.CallbackContext context);
+        void OnPreviousStation(InputAction.CallbackContext context);
         void OnVolUp(InputAction.CallbackContext context);
         void OnVolDown(InputAction.CallbackContext context);
     }

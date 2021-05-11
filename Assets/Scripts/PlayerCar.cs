@@ -19,7 +19,9 @@ public class PlayerCar : MonoBehaviour
     public bool build = false;
     public float buildDifference = 6.5f;
     AudioSource audioSource;
-    //AudioClip audioClip;
+    float time = 3900f;
+    public AudioClip[] radioStations;
+    int stationIndex = 0;
 
     private void Awake()
     {
@@ -42,16 +44,71 @@ public class PlayerCar : MonoBehaviour
 
         controls.Gameplay.Quit.performed += ctx => Application.Quit();
 
-        controls.Gameplay.VolUp.performed += ctx => audioSource.volume += 0.1f;
-        controls.Gameplay.VolDown.performed += ctx => audioSource.volume -= 0.1f;
+        controls.Gameplay.VolUp.performed += ctx => RepeatVolUp();
+        controls.Gameplay.VolUp.canceled += ctx => CancelInvoke("VolUp");
+
+        controls.Gameplay.VolDown.performed += ctx => RepeatVolDown();
+        controls.Gameplay.VolDown.canceled += ctx => CancelInvoke("VolDown");
+
+        controls.Gameplay.NextStation.performed += ctx => NextStation();
+        controls.Gameplay.PreviousStation.performed += ctx => PreviousStation();
 
 
     }
 
+    void NextStation()
+    {
+        if(stationIndex + 1 < radioStations.Length)
+            stationIndex++;
+        else
+            stationIndex = 0;
+        PlayStation(stationIndex, time);
+    }
+
+    void PreviousStation()
+    {
+        if (stationIndex > 0)
+            stationIndex--;
+        else
+            stationIndex = radioStations.Length - 1;
+        PlayStation(stationIndex, time);
+    }
+
+    void PlayStation(int index, float time)
+    {
+        float stationLength = radioStations[stationIndex].length;
+        audioSource.clip = radioStations[index];
+        audioSource.Play();
+        if(time < radioStations[stationIndex].length)
+            audioSource.time = time;
+        else
+        {
+            float stationTime = 0f;
+            float timeCopy = time;
+            bool flag = true;
+            while (!flag)
+            {
+                if (timeCopy - stationLength < stationLength)
+                {
+                    flag = false;
+                    stationTime = timeCopy - stationLength;
+                }
+                else
+                    timeCopy -= stationLength;
+            }
+            audioSource.time = stationTime;
+        }
+    }
+
+
+
     void Start()
     {
+        InvokeRepeating("Timer", 0f, 0.1f);
         audioSource = GetComponent<AudioSource>();
         audioSource.volume = 0.5f;
+        time = Random.Range(0, radioStations[stationIndex].length);
+        PlayStation(stationIndex, time);
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
@@ -120,6 +177,37 @@ public class PlayerCar : MonoBehaviour
     void ReverseCamera()
     {
         myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+    }
+
+    void RepeatVolUp()
+    {
+        if (!IsInvoking("VolUp") && !IsInvoking("VolDown"))
+            InvokeRepeating("VolUp", 0f, 0.1f);
+    }
+
+    void RepeatVolDown()
+    {
+        if (!IsInvoking("VolUp") && !IsInvoking("VolDown"))
+            InvokeRepeating("VolDown", 0f, 0.1f);
+    }
+
+    void VolUp()
+    {
+        audioSource.volume += 0.05f;
+        if (audioSource.volume > 1)
+            audioSource.volume = 1;
+    }
+
+    void VolDown()
+    {
+        audioSource.volume -= 0.05f;
+        if (audioSource.volume < 0)
+            audioSource.volume = 0;
+    }
+
+    void Timer()
+    {
+        time += 0.1f;
     }
 
     /*void Movement()

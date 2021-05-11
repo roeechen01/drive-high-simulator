@@ -62,7 +62,7 @@
                     "interactions": "Press(pressPoint=0.1)"
                 },
                 {
-                    "name": "NextChannel",
+                    "name": "NextStation",
                     "type": "Button",
                     "id": "e2a52324-1703-43e6-8ab7-d95087237abb",
                     "expectedControlType": "Button",
@@ -70,7 +70,7 @@
                     "interactions": ""
                 },
                 {
-                    "name": "PreviousChannel",
+                    "name": "PreviousStation",
                     "type": "Button",
                     "id": "fcaf3065-5fea-4f15-8816-6c05fbaaa0ae",
                     "expectedControlType": "Button",
@@ -83,7 +83,7 @@
                     "id": "5e1b02a0-50fc-45dc-a852-8fee764bd0c1",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "Press(pressPoint=0.1)"
                 },
                 {
                     "name": "VolDown",
@@ -91,7 +91,7 @@
                     "id": "0898368a-936c-4999-b9c9-5d428e5e8fc9",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "Press(pressPoint=0.1)"
                 }
             ],
             "bindings": [
@@ -179,7 +179,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "NextChannel",
+                    "action": "NextStation",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -190,7 +190,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "PreviousChannel",
+                    "action": "PreviousStation",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
