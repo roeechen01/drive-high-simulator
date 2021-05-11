@@ -7,7 +7,7 @@ public class PlayerCar : MonoBehaviour
 {
     Camera myCamera;
     Rigidbody myRigidbody;
-    float speedAddition = 1000f;
+    float speedAddition = 1200f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
     float cameraSpeed = 400f;
