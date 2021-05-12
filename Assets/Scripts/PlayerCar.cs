@@ -7,8 +7,9 @@ public class PlayerCar : MonoBehaviour
 {
     Camera myCamera;
     Rigidbody myRigidbody;
-    float soundAddition = 10f;
-    float speedAddition = 1200f;
+    float tick = 0.1f;
+    float soundAddition = 2f;
+    float speedAddition = 240f;
     float currentSound = 0f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
@@ -19,11 +20,14 @@ public class PlayerCar : MonoBehaviour
     float gasAmount;
     float reverseAmount;
     public bool build = false;
-    public float buildDifference = 6.5f;
+    public float buildDifference = 5.5f;
     public AudioSource radio;
     public AudioSource engine;
     float time = 0f;
     public AudioClip[] radioStations;
+    public AudioClip[] freestyleBeats;
+    readonly bool shuffleBeatsEveryLoop = false; //Change frestyle beats order every loop finish
+    int freestyleBeatIndex = 0;
     int stationIndex = 0;
 
     private void Awake()
@@ -61,9 +65,10 @@ public class PlayerCar : MonoBehaviour
 
     void Start()
     {
+        ShuffleArray(freestyleBeats);
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
-        InvokeRepeating("Timer", 0f, 0.1f);
+        InvokeRepeating("Timer", 0f, tick);
         radio.volume = 0.5f;
         float maxLength = 0f;
         for (int i = 0; i < radioStations.Length; i++)
@@ -72,10 +77,10 @@ public class PlayerCar : MonoBehaviour
         time = Random.Range(0, maxLength);
         PlayStation(stationIndex, time);
 
-       
-        
+
+
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
-        InvokeRepeating("CheckPedals", 0.1f, 0.5f);
+        InvokeRepeating("CheckPedals", 0.1f, 0.1f);
 
         if (build)
             speedAddition /= buildDifference;
@@ -84,9 +89,9 @@ public class PlayerCar : MonoBehaviour
 
     void CheckPedals()
     {
-        float reverseMax = -7500 / buildDifference, gasMax = 15000 / buildDifference;
+        float reverseMax = -7500f / buildDifference, gasMax = 15000f / buildDifference, noGasDiv = 15f;
 
-        if(!(reverseAmount > 0.2f) || !(gasAmount > 0.2f) || !(currentSpeed == 0))
+        if (!(reverseAmount > 0.2f) || !(gasAmount > 0.2f) || !(currentSpeed == 0))
         {
             if (reverseAmount > 0.2f && currentSpeed > reverseMax)
             {
@@ -111,8 +116,9 @@ public class PlayerCar : MonoBehaviour
             else if (currentSpeed > 0)
             {
                 currentSpeed -= speedAddition / 5;
-                currentSound -= soundAddition / 5;
+                currentSound -= soundAddition / noGasDiv;
                 if (currentSpeed <= speedAddition) currentSpeed = 0;
+                if (currentSound <= 0) currentSound = 0;
             }
 
             else
@@ -120,20 +126,22 @@ public class PlayerCar : MonoBehaviour
                 if (currentSpeed < 0)
                 {
                     currentSpeed += speedAddition / 5;
-                    currentSound += soundAddition / 5;
+                    currentSound -= soundAddition / noGasDiv;
                     if (currentSpeed >= speedAddition) currentSpeed = 0;
+                    if (currentSound <= 0) currentSound = 0;
                 }
+                else if (currentSpeed == 0)
+                    currentSound -= soundAddition;
             }
         }
-
-       
-
 
         if (currentSound < 0)
             currentSound = 0;
         else if (currentSound > 100)
             currentSound = 100;
-        engine.volume = currentSound / 100;  
+        //if (currentSound <= soundAddition && Mathf.Abs(currentSpeed) > 0)
+        // currentSound = (Mathf.Abs(currentSpeed) / -1 * reverseMax) * 100;
+        engine.volume = 0.8f * (currentSound / 100);
     }
 
     void Update()
@@ -206,10 +214,12 @@ public class PlayerCar : MonoBehaviour
 
     void NextStation()
     {
-        if (stationIndex + 1 < radioStations.Length)
+        if (stationIndex == radioStations.Length)
+            stationIndex = 0;
+        else if (stationIndex + 1 < radioStations.Length)
             stationIndex++;
         else
-            stationIndex = 0;
+            stationIndex = radioStations.Length;
         PlayStation(stationIndex, time);
     }
 
@@ -218,63 +228,131 @@ public class PlayerCar : MonoBehaviour
         if (stationIndex > 0)
             stationIndex--;
         else
-            stationIndex = radioStations.Length - 1;
+            stationIndex = radioStations.Length;
         PlayStation(stationIndex, time);
     }
 
     void PlayStation(int index, float time)
     {
-        float stationLength = radioStations[stationIndex].length;
-        radio.time = 0;
-        radio.clip = radioStations[index];
-        if (time < stationLength)
-            radio.time = time;
+        radio.loop = true;
+        if(index != radioStations.Length)
+        {
+            float stationLength = radioStations[stationIndex].length;
+            radio.time = 0;
+            radio.clip = radioStations[index];
+            if (time < stationLength)
+                radio.time = time;
+            else
+            {
+                float timeCopy = time;
+                while (timeCopy > stationLength)
+                    timeCopy -= stationLength;
+                radio.time = timeCopy;
+            }
+            radio.Play();
+        }
         else
         {
-            float timeCopy = time;
-            while (timeCopy > stationLength)
-                timeCopy -= stationLength;
-            radio.time = timeCopy;
+            float stationLength = 0f;
+            foreach (AudioClip freestyleBeat in freestyleBeats)
+                stationLength += freestyleBeat.length;
+            radio.time = 0;
+
+            if (time < stationLength)
+                FakeFreestyleBeatsStation(time);
+            else
+            {
+                float timeCopy = time;
+                while (timeCopy > stationLength)
+                    timeCopy -= stationLength;
+                FakeFreestyleBeatsStation(timeCopy);
+            }
+            radio.Play();
         }
-        radio.Play();
+        
+    }
+
+    void FakeFreestyleBeatsStation(float time)
+    {
+        radio.loop = false;
+        float timeLeft = time;
+        bool flag = true;
+        int index = 0;
+        while (flag)
+        {
+            if (index >= freestyleBeats.Length)
+                index = 0;
+            if (timeLeft < freestyleBeats[index].length)
+            {
+                freestyleBeatIndex = index;
+                flag = false;
+                radio.clip = freestyleBeats[index];
+                radio.time = timeLeft;
+
+            }
+            timeLeft -= freestyleBeats[index].length;
+            index++;
+        }
+    }
+
+    void CheckForNextFreestyleBeat()
+    {
+        if(!radio.loop && !radio.isPlaying) {
+            if (shuffleBeatsEveryLoop && freestyleBeatIndex >= freestyleBeats.Length - 1)
+                ShuffleArray(freestyleBeats);
+            PlayStation(stationIndex, time);
+        }
     }
 
     void Timer()
     {
-        time += 0.1f;
+        time += tick;
+        CheckForNextFreestyleBeat();
     }
 
-    /*void Movement()
+    public void ShuffleArray(AudioClip[] arr)
     {
-        if (Input.GetKey(KeyCode.W))
+        AudioClip other;
+        for (int i = 0; i < arr.Length; i++)
         {
-            myRigidbody.velocity = transform.forward * speed * Time.deltaTime;
+            int rnd = Random.Range(0, arr.Length);
+            other = arr[rnd];
+            arr[rnd] = arr[i];
+            arr[i] = other;
         }
-        else if (Input.GetKeyUp(KeyCode.W))
-        {
-            myRigidbody.velocity = Vector3.zero;
-        }
-       
-        if (Input.GetKey(KeyCode.S))
-        {
-            myRigidbody.velocity = transform.forward * -speed * Time.deltaTime;
-        }
-        else if (Input.GetKeyUp(KeyCode.S))
-        {
-            myRigidbody.velocity = Vector3.zero;
-        }
-    }
 
-    void ControlRotation()
-    {
-        if (Input.GetKey(KeyCode.A) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
+        /*void Movement()
         {
-            transform.Rotate(Vector3.down * rotationSpeed);
+            if (Input.GetKey(KeyCode.W))
+            {
+                myRigidbody.velocity = transform.forward * speed * Time.deltaTime;
+            }
+            else if (Input.GetKeyUp(KeyCode.W))
+            {
+                myRigidbody.velocity = Vector3.zero;
+            }
+
+            if (Input.GetKey(KeyCode.S))
+            {
+                myRigidbody.velocity = transform.forward * -speed * Time.deltaTime;
+            }
+            else if (Input.GetKeyUp(KeyCode.S))
+            {
+                myRigidbody.velocity = Vector3.zero;
+            }
         }
-        
-        if (Input.GetKey(KeyCode.D) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
+
+        void ControlRotation()
         {
-            transform.Rotate(Vector3.up * rotationSpeed);
-        }
-    }*/
+            if (Input.GetKey(KeyCode.A) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
+            {
+                transform.Rotate(Vector3.down * rotationSpeed);
+            }
+
+            if (Input.GetKey(KeyCode.D) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
+            {
+                transform.Rotate(Vector3.up * rotationSpeed);
+            }
+        }*/
+    }
 }
