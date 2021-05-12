@@ -7,7 +7,9 @@ public class PlayerCar : MonoBehaviour
 {
     Camera myCamera;
     Rigidbody myRigidbody;
+    float soundAddition = 10f;
     float speedAddition = 1200f;
+    float currentSound = 0f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
     float cameraSpeed = 400f;
@@ -18,7 +20,8 @@ public class PlayerCar : MonoBehaviour
     float reverseAmount;
     public bool build = false;
     public float buildDifference = 6.5f;
-    AudioSource audioSource;
+    public AudioSource radio;
+    public AudioSource engine;
     float time = 0f;
     public AudioClip[] radioStations;
     int stationIndex = 0;
@@ -56,48 +59,12 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    void NextStation()
-    {
-        if(stationIndex + 1 < radioStations.Length)
-            stationIndex++;
-        else
-            stationIndex = 0;
-        PlayStation(stationIndex, time);
-    }
-
-    void PreviousStation()
-    {
-        if (stationIndex > 0)
-            stationIndex--;
-        else
-            stationIndex = radioStations.Length - 1;
-        PlayStation(stationIndex, time);
-    }
-
-    void PlayStation(int index, float time)
-    {
-        float stationLength = radioStations[stationIndex].length;
-        audioSource.time = 0;
-        audioSource.clip = radioStations[index];
-        if(time < stationLength)
-            audioSource.time = time;
-        else
-        {
-            float timeCopy = time;
-            while (timeCopy > stationLength)
-                timeCopy -= stationLength;
-            audioSource.time = timeCopy;
-        }
-        audioSource.Play();
-    }
-
-
-
     void Start()
     {
+        myRigidbody = GetComponent<Rigidbody>();
+        myCamera = FindObjectOfType<Camera>();
         InvokeRepeating("Timer", 0f, 0.1f);
-        audioSource = GetComponent<AudioSource>();
-        audioSource.volume = 0.5f;
+        radio.volume = 0.5f;
         float maxLength = 0f;
         for (int i = 0; i < radioStations.Length; i++)
             if (radioStations[i].length > maxLength)
@@ -105,8 +72,8 @@ public class PlayerCar : MonoBehaviour
         time = Random.Range(0, maxLength);
         PlayStation(stationIndex, time);
 
-        myRigidbody = GetComponent<Rigidbody>();
-        myCamera = FindObjectOfType<Camera>();
+       
+        
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
         InvokeRepeating("CheckPedals", 0.1f, 0.5f);
 
@@ -118,38 +85,73 @@ public class PlayerCar : MonoBehaviour
     void CheckPedals()
     {
         float reverseMax = -7500 / buildDifference, gasMax = 15000 / buildDifference;
-        if (gasAmount > 0.2f && currentSpeed < gasMax)
-            currentSpeed += speedAddition * gasAmount;
-        else if (reverseAmount > 0.2f && currentSpeed > reverseMax)
-        {
-            if(currentSpeed > 0)
-                currentSpeed -= speedAddition * reverseAmount * 2;
-            else currentSpeed -= speedAddition * reverseAmount;
-        }
-            
-        else if (currentSpeed > 0)
-        {
-            currentSpeed -= speedAddition / 5;
-            if (currentSpeed <= speedAddition) currentSpeed = 0;
-        }
 
-        else
+        if(!(reverseAmount > 0.2f) || !(gasAmount > 0.2f) || !(currentSpeed == 0))
         {
-            if (currentSpeed < 0)
+            if (reverseAmount > 0.2f && currentSpeed > reverseMax)
             {
-                currentSpeed += speedAddition / 5;
-                if (currentSpeed >= speedAddition) currentSpeed = 0;
+                if (currentSpeed > 0)
+                {
+                    currentSpeed -= speedAddition * reverseAmount * 2;
+                    currentSound -= soundAddition * 2;
+                }
+
+                else
+                {
+                    currentSpeed -= speedAddition * reverseAmount;
+                    currentSound += soundAddition;
+                }
+            }
+            else if (gasAmount > 0.2f && currentSpeed < gasMax)
+            {
+                currentSpeed += speedAddition * gasAmount;
+                currentSound += soundAddition / 2;
+            }
+
+            else if (currentSpeed > 0)
+            {
+                currentSpeed -= speedAddition / 5;
+                currentSound -= soundAddition / 5;
+                if (currentSpeed <= speedAddition) currentSpeed = 0;
+            }
+
+            else
+            {
+                if (currentSpeed < 0)
+                {
+                    currentSpeed += speedAddition / 5;
+                    currentSound += soundAddition / 5;
+                    if (currentSpeed >= speedAddition) currentSpeed = 0;
+                }
             }
         }
+
+       
+
+
+        if (currentSound < 0)
+            currentSound = 0;
+        else if (currentSound > 100)
+            currentSound = 100;
+        engine.volume = currentSound / 100;  
     }
 
     void Update()
     {
+        ChangeSpeed();
+        ChangeCameraDirection();
+    }
+
+    private void ChangeSpeed()
+    {
         if (currentSpeed != 0)
             transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
         myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
-        
-        if(view != Vector2.zero)
+    }
+
+    void ChangeCameraDirection()
+    {
+        if (view != Vector2.zero)
         {
             myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);//for one direction viewing
             //myCamera.transform.Rotate(new Vector3(view.y, view.x, 0) * cameraSpeed * Time.deltaTime);//for two directions viewing
@@ -190,16 +192,51 @@ public class PlayerCar : MonoBehaviour
 
     void VolUp()
     {
-        audioSource.volume += 0.05f;
-        if (audioSource.volume > 1)
-            audioSource.volume = 1;
+        radio.volume += 0.05f;
+        if (radio.volume > 1)
+            radio.volume = 1;
     }
 
     void VolDown()
     {
-        audioSource.volume -= 0.05f;
-        if (audioSource.volume < 0)
-            audioSource.volume = 0;
+        radio.volume -= 0.05f;
+        if (radio.volume < 0)
+            radio.volume = 0;
+    }
+
+    void NextStation()
+    {
+        if (stationIndex + 1 < radioStations.Length)
+            stationIndex++;
+        else
+            stationIndex = 0;
+        PlayStation(stationIndex, time);
+    }
+
+    void PreviousStation()
+    {
+        if (stationIndex > 0)
+            stationIndex--;
+        else
+            stationIndex = radioStations.Length - 1;
+        PlayStation(stationIndex, time);
+    }
+
+    void PlayStation(int index, float time)
+    {
+        float stationLength = radioStations[stationIndex].length;
+        radio.time = 0;
+        radio.clip = radioStations[index];
+        if (time < stationLength)
+            radio.time = time;
+        else
+        {
+            float timeCopy = time;
+            while (timeCopy > stationLength)
+                timeCopy -= stationLength;
+            radio.time = timeCopy;
+        }
+        radio.Play();
     }
 
     void Timer()
