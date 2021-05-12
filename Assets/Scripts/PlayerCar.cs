@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class PlayerCar : MonoBehaviour
 {
@@ -53,7 +53,7 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.NextStation.performed += ctx => NextStation();
         controls.Gameplay.PreviousStation.performed += ctx => PreviousStation();
 
-
+        controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     void NextStation()

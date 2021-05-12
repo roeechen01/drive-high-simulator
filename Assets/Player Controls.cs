@@ -105,6 +105,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press(pressPoint=0.1)""
+                },
+                {
+                    ""name"": ""Restart"",
+                    ""type"": ""Button"",
+                    ""id"": ""d0b9af9d-346d-4b35-be55-ef68f59fd9aa"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -228,6 +236,17 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""action"": ""VolDown"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""7c88afd3-ca49-46fc-bcc1-066626b109e8"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Restart"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -247,6 +266,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         m_Gameplay_PreviousStation = m_Gameplay.FindAction("PreviousStation", throwIfNotFound: true);
         m_Gameplay_VolUp = m_Gameplay.FindAction("VolUp", throwIfNotFound: true);
         m_Gameplay_VolDown = m_Gameplay.FindAction("VolDown", throwIfNotFound: true);
+        m_Gameplay_Restart = m_Gameplay.FindAction("Restart", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -307,6 +327,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_PreviousStation;
     private readonly InputAction m_Gameplay_VolUp;
     private readonly InputAction m_Gameplay_VolDown;
+    private readonly InputAction m_Gameplay_Restart;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -322,6 +343,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         public InputAction @PreviousStation => m_Wrapper.m_Gameplay_PreviousStation;
         public InputAction @VolUp => m_Wrapper.m_Gameplay_VolUp;
         public InputAction @VolDown => m_Wrapper.m_Gameplay_VolDown;
+        public InputAction @Restart => m_Wrapper.m_Gameplay_Restart;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -364,6 +386,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @VolDown.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnVolDown;
                 @VolDown.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnVolDown;
                 @VolDown.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnVolDown;
+                @Restart.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnRestart;
+                @Restart.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnRestart;
+                @Restart.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnRestart;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -401,6 +426,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @VolDown.started += instance.OnVolDown;
                 @VolDown.performed += instance.OnVolDown;
                 @VolDown.canceled += instance.OnVolDown;
+                @Restart.started += instance.OnRestart;
+                @Restart.performed += instance.OnRestart;
+                @Restart.canceled += instance.OnRestart;
             }
         }
     }
@@ -418,5 +446,6 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         void OnPreviousStation(InputAction.CallbackContext context);
         void OnVolUp(InputAction.CallbackContext context);
         void OnVolDown(InputAction.CallbackContext context);
+        void OnRestart(InputAction.CallbackContext context);
     }
 }
