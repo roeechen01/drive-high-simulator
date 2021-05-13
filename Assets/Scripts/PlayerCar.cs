@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System;
 
 public class PlayerCar : MonoBehaviour
 {
@@ -13,17 +14,19 @@ public class PlayerCar : MonoBehaviour
     float currentSound = 0f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
-    float cameraSpeed = 400f;
     PlayerControls controls;
     Vector2 direction;
     Vector2 view;
     float gasAmount;
     float reverseAmount;
+    Vector2 last = Vector2.zero;
     public bool build = false;
     public float buildDifference = 5.5f;
     Radio radio;
     public AudioSource engine;
     float time = 0f;
+    bool r3 = false;
+    bool lastR3 = false;
     
 
     private void Awake()
@@ -60,12 +63,10 @@ public class PlayerCar : MonoBehaviour
         radio = GetComponent<Radio>();
         InvokeRepeating("Timer", 0f, tick);
        
-       
-
-
-
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
         InvokeRepeating("CheckPedals", 0.1f, 0.1f);
+        
+        //InvokeRepeating("ChangeCameraDirection", 0f, 0.05f);
 
         if (build)
             speedAddition /= buildDifference;
@@ -144,11 +145,41 @@ public class PlayerCar : MonoBehaviour
 
     void ChangeCameraDirection()
     {
-        if (view != Vector2.zero)
+        float stickError = 0.1f, humanError = 0.05f;
+        if ((lastR3 != r3) || view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError)
         {
-            myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);//for one direction viewing
-            //myCamera.transform.Rotate(new Vector3(view.y, view.x, 0) * cameraSpeed * Time.deltaTime);//for two directions viewing
+            //myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);//for one direction viewing
+            //myCamera.transform.Rotate(new Vector3(-view.y, view.x, 0) * cameraSpeed * Time.deltaTime);//for two directions viewing
+            if (Vector2.Distance(last, view) > humanError)
+            {
+                float multiplier = 75f;
+
+                if (lastR3 == r3)
+                {
+                    myCamera.transform.localRotation = Quaternion.Euler(-view.y * multiplier, view.x * multiplier, 0f);
+                    if (r3)
+                        myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+                }
+                else
+                {
+                    myCamera.transform.localRotation = Quaternion.Euler(-view.y * multiplier, view.x * multiplier, 0f);
+                    myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+                }
+                last = view;
+            }
+            else
+            {
+                if (lastR3 != r3)
+                    myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+            }
         }
+        else
+        {
+            myCamera.transform.localRotation = Quaternion.identity;
+            if (r3)
+                myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+        }
+        lastR3 = r3;
     }
 
     private void OnEnable()
@@ -163,12 +194,13 @@ public class PlayerCar : MonoBehaviour
 
     void ResetCamera()
     {
-        myCamera.transform.rotation = transform.rotation;
+        myCamera.transform.localRotation = Quaternion.identity;
     }
 
     void ReverseCamera()
     {
-        myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+        //myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+        r3 = !r3;
     }
 
     public float TimeNow
