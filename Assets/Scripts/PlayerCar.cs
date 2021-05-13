@@ -21,14 +21,10 @@ public class PlayerCar : MonoBehaviour
     float reverseAmount;
     public bool build = false;
     public float buildDifference = 5.5f;
-    public AudioSource radio;
+    Radio radio;
     public AudioSource engine;
     float time = 0f;
-    public AudioClip[] radioStations;
-    public AudioClip[] freestyleBeats;
-    readonly bool shuffleBeatsEveryLoop = false; //Change frestyle beats order every loop finish
-    int freestyleBeatIndex = 0;
-    int stationIndex = 0;
+    
 
     private void Awake()
     {
@@ -51,31 +47,20 @@ public class PlayerCar : MonoBehaviour
 
         controls.Gameplay.Quit.performed += ctx => Application.Quit();
 
-        controls.Gameplay.VolUp.performed += ctx => RepeatVolUp();
-        controls.Gameplay.VolUp.canceled += ctx => CancelInvoke("VolUp");
-
-        controls.Gameplay.VolDown.performed += ctx => RepeatVolDown();
-        controls.Gameplay.VolDown.canceled += ctx => CancelInvoke("VolDown");
-
-        controls.Gameplay.NextStation.performed += ctx => NextStation();
-        controls.Gameplay.PreviousStation.performed += ctx => PreviousStation();
+        
 
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     void Start()
     {
-        ShuffleArray(freestyleBeats);
+        
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
+        radio = GetComponent<Radio>();
         InvokeRepeating("Timer", 0f, tick);
-        radio.volume = 0.5f;
-        float maxLength = 0f;
-        for (int i = 0; i < radioStations.Length; i++)
-            if (radioStations[i].length > maxLength)
-                maxLength = radioStations[i].length;
-        time = Random.Range(0, maxLength);
-        PlayStation(stationIndex, time);
+       
+       
 
 
 
@@ -89,7 +74,7 @@ public class PlayerCar : MonoBehaviour
 
     void CheckPedals()
     {
-        float reverseMax = -7500f / buildDifference, gasMax = 15000f / buildDifference, noGasDiv = 15f;
+        float reverseMax = -7500f / buildDifference, gasMax = 15000f / buildDifference, noGasDiv = 15f, minSound = 10f;
 
         if (!(reverseAmount > 0.2f) || !(gasAmount > 0.2f) || !(currentSpeed == 0))
         {
@@ -135,8 +120,8 @@ public class PlayerCar : MonoBehaviour
             }
         }
 
-        if (currentSound < 0)
-            currentSound = 0;
+        if (currentSound < minSound)
+            currentSound = minSound;
         else if (currentSound > 100)
             currentSound = 100;
         //if (currentSound <= soundAddition && Mathf.Abs(currentSpeed) > 0)
@@ -186,173 +171,15 @@ public class PlayerCar : MonoBehaviour
         myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
     }
 
-    void RepeatVolUp()
+    public float TimeNow
     {
-        if (!IsInvoking("VolUp") && !IsInvoking("VolDown"))
-            InvokeRepeating("VolUp", 0f, 0.1f);
-    }
-
-    void RepeatVolDown()
-    {
-        if (!IsInvoking("VolUp") && !IsInvoking("VolDown"))
-            InvokeRepeating("VolDown", 0f, 0.1f);
-    }
-
-    void VolUp()
-    {
-        radio.volume += 0.05f;
-        if (radio.volume > 1)
-            radio.volume = 1;
-    }
-
-    void VolDown()
-    {
-        radio.volume -= 0.05f;
-        if (radio.volume < 0)
-            radio.volume = 0;
-    }
-
-    void NextStation()
-    {
-        if (stationIndex == radioStations.Length)
-            stationIndex = 0;
-        else if (stationIndex + 1 < radioStations.Length)
-            stationIndex++;
-        else
-            stationIndex = radioStations.Length;
-        PlayStation(stationIndex, time);
-    }
-
-    void PreviousStation()
-    {
-        if (stationIndex > 0)
-            stationIndex--;
-        else
-            stationIndex = radioStations.Length;
-        PlayStation(stationIndex, time);
-    }
-
-    void PlayStation(int index, float time)
-    {
-        radio.loop = true;
-        if(index != radioStations.Length)
-        {
-            float stationLength = radioStations[stationIndex].length;
-            radio.time = 0;
-            radio.clip = radioStations[index];
-            if (time < stationLength)
-                radio.time = time;
-            else
-            {
-                float timeCopy = time;
-                while (timeCopy > stationLength)
-                    timeCopy -= stationLength;
-                radio.time = timeCopy;
-            }
-            radio.Play();
-        }
-        else
-        {
-            float stationLength = 0f;
-            foreach (AudioClip freestyleBeat in freestyleBeats)
-                stationLength += freestyleBeat.length;
-            radio.time = 0;
-
-            if (time < stationLength)
-                FakeFreestyleBeatsStation(time);
-            else
-            {
-                float timeCopy = time;
-                while (timeCopy > stationLength)
-                    timeCopy -= stationLength;
-                FakeFreestyleBeatsStation(timeCopy);
-            }
-            radio.Play();
-        }
-        
-    }
-
-    void FakeFreestyleBeatsStation(float time)
-    {
-        radio.loop = false;
-        float timeLeft = time;
-        bool flag = true;
-        int index = 0;
-        while (flag)
-        {
-            if (index >= freestyleBeats.Length)
-                index = 0;
-            if (timeLeft < freestyleBeats[index].length)
-            {
-                freestyleBeatIndex = index;
-                flag = false;
-                radio.clip = freestyleBeats[index];
-                radio.time = timeLeft;
-
-            }
-            timeLeft -= freestyleBeats[index].length;
-            index++;
-        }
-    }
-
-    void CheckForNextFreestyleBeat()
-    {
-        if(!radio.loop && !radio.isPlaying) {
-            if (shuffleBeatsEveryLoop && freestyleBeatIndex >= freestyleBeats.Length - 1)
-                ShuffleArray(freestyleBeats);
-            PlayStation(stationIndex, time);
-        }
+        get { return time; }
+        set {time = value; }
     }
 
     void Timer()
     {
         time += tick;
-        CheckForNextFreestyleBeat();
-    }
-
-    public void ShuffleArray(AudioClip[] arr)
-    {
-        AudioClip other;
-        for (int i = 0; i < arr.Length; i++)
-        {
-            int rnd = Random.Range(0, arr.Length);
-            other = arr[rnd];
-            arr[rnd] = arr[i];
-            arr[i] = other;
-        }
-
-        /*void Movement()
-        {
-            if (Input.GetKey(KeyCode.W))
-            {
-                myRigidbody.velocity = transform.forward * speed * Time.deltaTime;
-            }
-            else if (Input.GetKeyUp(KeyCode.W))
-            {
-                myRigidbody.velocity = Vector3.zero;
-            }
-
-            if (Input.GetKey(KeyCode.S))
-            {
-                myRigidbody.velocity = transform.forward * -speed * Time.deltaTime;
-            }
-            else if (Input.GetKeyUp(KeyCode.S))
-            {
-                myRigidbody.velocity = Vector3.zero;
-            }
-        }
-
-        void ControlRotation()
-        {
-            if (Input.GetKey(KeyCode.A) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
-            {
-                transform.Rotate(Vector3.down * rotationSpeed);
-            }
-
-            if (Input.GetKey(KeyCode.D) && (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S)))
-            {
-                transform.Rotate(Vector3.up * rotationSpeed);
-            }
-        }*/
+        radio.CheckForNextFreestyleBeat();
     }
 }

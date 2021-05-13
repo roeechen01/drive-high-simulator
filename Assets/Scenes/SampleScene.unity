@@ -1798,21 +1798,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   build: 0
   buildDifference: 5.5
-  radio: {fileID: 216346451}
   engine: {fileID: 216346452}
-  radioStations:
-  - {fileID: 8300000, guid: a5461cdbaded34f45af0851ad3c46635, type: 3}
-  - {fileID: 8300000, guid: 4ea03e9cd586b2f4aa6ce13c7baf8fdb, type: 3}
-  - {fileID: 8300000, guid: eb178701caeb3914f846cc03196d4dea, type: 3}
-  - {fileID: 8300000, guid: d38f8ce57d86b424d83f53785ff86bf6, type: 3}
-  - {fileID: 8300000, guid: 00407017234b4ac4a96d1fcc8f3ff2ae, type: 3}
-  - {fileID: 8300000, guid: e10cfdf75108ea7408a8ef7f16dd5848, type: 3}
-  - {fileID: 8300000, guid: 051a8ae409cfb3740bad4cb27255a986, type: 3}
-  - {fileID: 8300000, guid: a4ba98ff4c4d47a4bb7cd24330b92e78, type: 3}
-  freestyleBeats:
-  - {fileID: 8300000, guid: 6b85e773335e08a46b0caf2e5be96896, type: 3}
-  - {fileID: 8300000, guid: a5eb5a21eb20828449e79d254c48a27a, type: 3}
-  - {fileID: 8300000, guid: 080f07699e2ade74a894557e347afdab, type: 3}
 --- !u!54 &216346450
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2021,6 +2007,32 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &216346453
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216346448}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a91affa0e0740484cabb3c15418845ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  radio: {fileID: 216346451}
+  radioStations:
+  - {fileID: 8300000, guid: a5461cdbaded34f45af0851ad3c46635, type: 3}
+  - {fileID: 8300000, guid: eb178701caeb3914f846cc03196d4dea, type: 3}
+  - {fileID: 8300000, guid: 4ea03e9cd586b2f4aa6ce13c7baf8fdb, type: 3}
+  - {fileID: 8300000, guid: 051a8ae409cfb3740bad4cb27255a986, type: 3}
+  - {fileID: 8300000, guid: e10cfdf75108ea7408a8ef7f16dd5848, type: 3}
+  - {fileID: 8300000, guid: a4ba98ff4c4d47a4bb7cd24330b92e78, type: 3}
+  - {fileID: 8300000, guid: d38f8ce57d86b424d83f53785ff86bf6, type: 3}
+  - {fileID: 8300000, guid: 00407017234b4ac4a96d1fcc8f3ff2ae, type: 3}
+  freestyleBeats:
+  - {fileID: 8300000, guid: 6b85e773335e08a46b0caf2e5be96896, type: 3}
+  - {fileID: 8300000, guid: a5eb5a21eb20828449e79d254c48a27a, type: 3}
+  - {fileID: 8300000, guid: 080f07699e2ade74a894557e347afdab, type: 3}
 --- !u!1 &223163709
 GameObject:
   m_ObjectHideFlags: 0
