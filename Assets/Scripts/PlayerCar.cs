@@ -66,7 +66,7 @@ public class PlayerCar : MonoBehaviour
         myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
         InvokeRepeating("CheckPedals", 0.1f, 0.1f);
         
-        //InvokeRepeating("ChangeCameraDirection", 0f, 0.05f);
+        //InvokeRepeating("ChangeCameraDirection", 0f, 0.01f);
 
         if (build)
             speedAddition /= buildDifference;
@@ -158,7 +158,10 @@ public class PlayerCar : MonoBehaviour
                 {
                     myCamera.transform.localRotation = Quaternion.Euler(-view.y * multiplier, view.x * multiplier, 0f);
                     if (r3)
+                    {
+                        myCamera.transform.localRotation = Quaternion.Euler(view.y * multiplier, view.x * multiplier, 0f);
                         myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+                    }
                 }
                 else
                 {
