@@ -14,6 +14,7 @@ public class PlayerCar : MonoBehaviour
     float currentSound = 0f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
+    float cameraSpeed = 150f;
     PlayerControls controls;
     Vector2 direction;
     Vector2 view;
@@ -24,9 +25,7 @@ public class PlayerCar : MonoBehaviour
     public float buildDifference = 5.5f;
     Radio radio;
     public AudioSource engine;
-    float time = 0f;
     bool r3 = false;
-    bool lastR3 = false;
     
 
     private void Awake()
@@ -53,24 +52,6 @@ public class PlayerCar : MonoBehaviour
         
 
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
-    void Start()
-    {
-        
-        myRigidbody = GetComponent<Rigidbody>();
-        myCamera = FindObjectOfType<Camera>();
-        radio = GetComponent<Radio>();
-        InvokeRepeating("Timer", 0f, tick);
-       
-        myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
-        InvokeRepeating("CheckPedals", 0.1f, 0.1f);
-        
-        //InvokeRepeating("ChangeCameraDirection", 0f, 0.01f);
-
-        if (build)
-            speedAddition /= buildDifference;
-        else buildDifference = 1;
     }
 
     void CheckPedals()
@@ -143,47 +124,126 @@ public class PlayerCar : MonoBehaviour
         myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
     }
 
+    void Start()
+    {
+
+        myRigidbody = GetComponent<Rigidbody>();
+        myCamera = FindObjectOfType<Camera>();
+        radio = GetComponent<Radio>();
+        InvokeRepeating("Timer", 0f, tick);
+
+        myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
+        InvokeRepeating("CheckPedals", 0.1f, 0.1f);
+
+        //InvokeRepeating("ChangeCameraDirection", 0f, 0.01f);
+
+        if (build)
+            speedAddition /= buildDifference;
+        else buildDifference = 1;
+    }
+
+    float multiplier = 75f;
+    //int counter;
     void ChangeCameraDirection()
     {
-        float stickError = 0.1f, humanError = 0.05f;
-        if ((lastR3 != r3) || view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError)
+        float stickError = 0.1f;
+        if (view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError)
         {
-            //myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);//for one direction viewing
-            //myCamera.transform.Rotate(new Vector3(-view.y, view.x, 0) * cameraSpeed * Time.deltaTime);//for two directions viewing
-            if (Vector2.Distance(last, view) > humanError)
+            if (!r3)
             {
-                float multiplier = 75f;
-
-                if (lastR3 == r3)
+                if (myCamera.transform.localRotation.eulerAngles.y < 75 || myCamera.transform.localRotation.eulerAngles.y > 285)
                 {
-                    myCamera.transform.localRotation = Quaternion.Euler(-view.y * multiplier, view.x * multiplier, 0f);
-                    if (r3)
-                    {
-                        myCamera.transform.localRotation = Quaternion.Euler(view.y * multiplier, view.x * multiplier, 0f);
-                        myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
-                    }
+                    myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);
                 }
                 else
                 {
-                    myCamera.transform.localRotation = Quaternion.Euler(-view.y * multiplier, view.x * multiplier, 0f);
-                    myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+                    if (myCamera.transform.localRotation.eulerAngles.y <= 275)
+                        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y - 0.01f, 0f);
+
+                    if (myCamera.transform.localRotation.eulerAngles.y >= 85)
+                        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y + 0.01f, 0f);
                 }
-                last = view;
+                if (myCamera.transform.localRotation.eulerAngles.x < 75 || myCamera.transform.localRotation.eulerAngles.x > 285)
+                {
+                    myCamera.transform.Rotate(new Vector3(-view.y, 0, 0) * cameraSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    if (myCamera.transform.localRotation.eulerAngles.x <= 275)
+                        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x - 0.01f, myCamera.transform.localRotation.eulerAngles.y, 0f);
+
+                    if (myCamera.transform.localRotation.eulerAngles.x >= 85)
+                        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x + 0.01f, myCamera.transform.localRotation.eulerAngles.y, 0f);
+                }
             }
             else
             {
-                if (lastR3 != r3)
-                    myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+                if (myCamera.transform.localRotation.eulerAngles.y < 255 && myCamera.transform.localRotation.eulerAngles.y > 105)
+                {
+                    myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    if (myCamera.transform.localRotation.eulerAngles.y >= 115)
+                        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y - 0.01f, 0f);
+
+                    if (myCamera.transform.localRotation.eulerAngles.y <= 245)
+                        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y + 0.01f, 0f);
+                }
+
+                if (myCamera.transform.localRotation.eulerAngles.x < 75 || myCamera.transform.localRotation.eulerAngles.x > 295)
+                {
+                    myCamera.transform.Rotate(new Vector3(-view.y, 0, 0) * cameraSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    if (myCamera.transform.localRotation.eulerAngles.x >= 285)
+                        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x + 0.01f, myCamera.transform.localRotation.eulerAngles.y, 0f);
+
+                    if (myCamera.transform.localRotation.eulerAngles.x <= 85)
+                        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x - 0.01f, myCamera.transform.localRotation.eulerAngles.y, 0f);
+                }
             }
+            myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y, 0f);
         }
-        else
-        {
-            myCamera.transform.localRotation = Quaternion.identity;
-            if (r3)
-                myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
-        }
-        lastR3 = r3;
+          
     }
+
+    float div = 50f;
+    Quaternion step;
+    void Animate()
+    {
+        Quaternion rotationTo = StickToRotation(view);
+        Quaternion rot = Quaternion.FromToRotation(new Vector3(myCamera.transform.localRotation.x, myCamera.transform.localRotation.y, myCamera.transform.localRotation.z) , new Vector3(rotationTo.x, rotationTo.y, rotationTo.z));
+        //myCamera.transform.rotation = rotationTo;
+        step = rot ;
+        step.x = rot.x / div;
+        step.y = rot.y / div;
+        InvokeRepeating("Step", 0f, 0.1f);
+
+    }
+
+    void Step()
+    {
+        print(step.x + ", " + step.y);
+        myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.x + step.x, myCamera.transform.localRotation.y + step.y, 0f);
+        //counter--;
+        //if (counter <= 0)
+            //CancelInvoke("Step");
+    }
+
+    Quaternion StickToRotation(Vector2 stick)
+    {
+        Quaternion rotation = Quaternion.identity;
+        rotation.x = -stick.y * multiplier;
+        rotation.y = stick.x * multiplier;
+        return rotation;
+    }
+
+    /*Vector2 RotationToStick(Vector2 rotation)
+    {
+        return new Vector2(rotation.y / multiplier , -rotation.x / multiplier );
+    }*/
 
     private void OnEnable()
     {
@@ -197,24 +257,21 @@ public class PlayerCar : MonoBehaviour
 
     void ResetCamera()
     {
-        myCamera.transform.localRotation = Quaternion.identity;
+        if(!r3)
+            myCamera.transform.localRotation = Quaternion.identity;
     }
 
     void ReverseCamera()
     {
-        //myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+        myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
         r3 = !r3;
     }
 
-    public float TimeNow
-    {
-        get { return time; }
-        set {time = value; }
-    }
+    public float TimeNow { get; set; } = 0f;
 
     void Timer()
     {
-        time += tick;
+        TimeNow += tick;
         radio.CheckForNextFreestyleBeat();
     }
 }
