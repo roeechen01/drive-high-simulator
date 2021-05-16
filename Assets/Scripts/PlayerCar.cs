@@ -14,7 +14,8 @@ public class PlayerCar : MonoBehaviour
     float currentSound = 0f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
-    float cameraSpeed = 200f;
+    float cameraSpeedRightLeft = 180f;
+    float cameraSpeedUpDown = 120f;
     PlayerControls controls;
     Vector2 direction;
     Vector2 view;
@@ -107,7 +108,7 @@ public class PlayerCar : MonoBehaviour
             currentSound = 100;
         //if (currentSound <= soundAddition && Mathf.Abs(currentSpeed) > 0)
         // currentSound = (Mathf.Abs(currentSpeed) / -1 * reverseMax) * 100;
-        engine.volume = 0.8f * (currentSound / 100);
+        engine.volume = 0.3f/*0.8f*/ * (currentSound / 100);
     }
 
     void Update()
@@ -125,7 +126,6 @@ public class PlayerCar : MonoBehaviour
 
     void Start()
     {
-
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
         radio = GetComponent<Radio>();
@@ -148,7 +148,7 @@ public class PlayerCar : MonoBehaviour
             {
                 if (myCamera.transform.localRotation.eulerAngles.y < 75 || myCamera.transform.localRotation.eulerAngles.y > 285)
                 {
-                    myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);
+                    myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeedRightLeft * Time.deltaTime);
                 }
                 else
                 {
@@ -160,7 +160,7 @@ public class PlayerCar : MonoBehaviour
                 }
                 if (myCamera.transform.localRotation.eulerAngles.x < 75 || myCamera.transform.localRotation.eulerAngles.x > 285)
                 {
-                    myCamera.transform.Rotate(new Vector3(-view.y, 0, 0) * cameraSpeed * Time.deltaTime);
+                    myCamera.transform.Rotate(new Vector3(-view.y, 0, 0) * cameraSpeedUpDown * Time.deltaTime);
                 }
                 else
                 {
@@ -175,7 +175,7 @@ public class PlayerCar : MonoBehaviour
             {
                 if (myCamera.transform.localRotation.eulerAngles.y < 255 && myCamera.transform.localRotation.eulerAngles.y > 105)
                 {
-                    myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeed * Time.deltaTime);
+                    myCamera.transform.Rotate(new Vector3(0, view.x, 0) * cameraSpeedRightLeft * Time.deltaTime);
                 }
                 else
                 {
@@ -188,7 +188,7 @@ public class PlayerCar : MonoBehaviour
 
                 if (myCamera.transform.localRotation.eulerAngles.x < 75 || myCamera.transform.localRotation.eulerAngles.x > 295)
                 {
-                    myCamera.transform.Rotate(new Vector3(-view.y, 0, 0) * cameraSpeed * Time.deltaTime);
+                    myCamera.transform.Rotate(new Vector3(-view.y, 0, 0) * cameraSpeedUpDown * Time.deltaTime);
                 }
                 else
                 {

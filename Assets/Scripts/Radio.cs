@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Radio : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class Radio : MonoBehaviour
     PlayerCar playerCar;
     PlayerControls controls;
     public AudioSource radio;
+    [SerializeField] string[] radioStationsNames;
+    [SerializeField] Font[] radioStationsFonts;
+    [SerializeField] Text radioText;
     public AudioClip[] radioStations;
     public AudioClip[] freestyleBeats;
     readonly bool shuffleBeatsEveryLoop = false; //Change frestyle beats order every loop finish
@@ -133,7 +137,9 @@ public class Radio : MonoBehaviour
             }
             radio.Play();
         }
-
+        radioText.text = radioStationsNames[index];
+        radioText.font = radioStationsFonts[index];
+        //radioText.fontStyle = FontStyle.Bold;
     }
 
     void FakeFreestyleBeatsStation(float time)
