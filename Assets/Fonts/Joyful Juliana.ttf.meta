@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5b5f765887d30cd449be8132cfe82997
+guid: 846202ee9ffafe04ca90b0114e3fbc83
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Radio Space Semi-Italic
+  - Joyful Juliana
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

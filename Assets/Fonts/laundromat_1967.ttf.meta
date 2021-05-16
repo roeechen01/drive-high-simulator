@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 6c1ca41d6e97ec54588f62e3a4b779ff
+guid: 4f90cbee7df0a08429e8479618497cce
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Radio Space Condensed Italic
+  - laundromat 1967
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

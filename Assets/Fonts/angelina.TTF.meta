@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 58cba9c11c3e4934cb9bd31f285c966d
+guid: 62bfc9518ca50704482b79479c16da88
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Radio Space Leftalic
+  - Angelina
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 74df28b965de31a4d9c99685319c8f9f
+guid: 7f4bfe764f6b99444ae30e6555b1d94d
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Radio Space Italic
+  - Evanescent
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
