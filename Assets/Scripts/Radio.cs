@@ -13,6 +13,7 @@ public class Radio : MonoBehaviour
     [SerializeField] Font[] radioStationsFonts;
     [SerializeField] Text radioText;
     [SerializeField] Text clockText;
+    [SerializeField] LightCycle lightCycle;
     public Text speedText;
     public AudioClip[] radioStations;
     public AudioClip[] freestyleBeats;
@@ -20,7 +21,7 @@ public class Radio : MonoBehaviour
     int freestyleBeatIndex = 0;
     int stationIndex = 0;
     float clockTime = 0f;
-    float minuteTime = 1f;
+    public static float minuteTime = 0.1f;
 
     private void Awake()
     {
@@ -196,10 +197,12 @@ public class Radio : MonoBehaviour
 
     void AddMinute()
     {
+        float dayMinutes = 1440;
         clockTime += 1f;
-        if (clockTime >= 1440)
+        if (clockTime >= dayMinutes)
             clockTime = 0;
         SetClock();
+        lightCycle.UpdateLight(clockTime);
     }
 
     void SetClock()

@@ -2042,6 +2042,7 @@ MonoBehaviour:
   - {fileID: 12800000, guid: 1ed7f244882e7a74bbf2602b41dd3800, type: 3}
   radioText: {fileID: 1574409402}
   clockText: {fileID: 1472480907}
+  lightCycle: {fileID: 705507996}
   speedText: {fileID: 448108172}
   radioStations:
   - {fileID: 8300000, guid: a5461cdbaded34f45af0851ad3c46635, type: 3}
@@ -6064,6 +6065,7 @@ GameObject:
   m_Component:
   - component: {fileID: 705507995}
   - component: {fileID: 705507994}
+  - component: {fileID: 705507996}
   m_Layer: 0
   m_Name: Directional Light
   m_TagString: Untagged
@@ -6147,6 +6149,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!114 &705507996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 705507993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebb5e2fc1cc6aec4fa7b92dc8eb94b54, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &761436685
 MonoBehaviour:
   m_ObjectHideFlags: 0
