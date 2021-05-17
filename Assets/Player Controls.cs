@@ -113,6 +113,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""ToggleHUD"",
+                    ""type"": ""Button"",
+                    ""id"": ""fb0e41ac-0c14-4823-b8d9-842004f933c0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -247,6 +255,17 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""action"": ""Restart"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""811d7ff5-903e-45c3-a551-fffa33ba79f3"",
+                    ""path"": ""<Gamepad>/leftStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleHUD"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -267,6 +286,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         m_Gameplay_VolUp = m_Gameplay.FindAction("VolUp", throwIfNotFound: true);
         m_Gameplay_VolDown = m_Gameplay.FindAction("VolDown", throwIfNotFound: true);
         m_Gameplay_Restart = m_Gameplay.FindAction("Restart", throwIfNotFound: true);
+        m_Gameplay_ToggleHUD = m_Gameplay.FindAction("ToggleHUD", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -328,6 +348,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_VolUp;
     private readonly InputAction m_Gameplay_VolDown;
     private readonly InputAction m_Gameplay_Restart;
+    private readonly InputAction m_Gameplay_ToggleHUD;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -344,6 +365,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         public InputAction @VolUp => m_Wrapper.m_Gameplay_VolUp;
         public InputAction @VolDown => m_Wrapper.m_Gameplay_VolDown;
         public InputAction @Restart => m_Wrapper.m_Gameplay_Restart;
+        public InputAction @ToggleHUD => m_Wrapper.m_Gameplay_ToggleHUD;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -389,6 +411,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @Restart.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnRestart;
                 @Restart.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnRestart;
                 @Restart.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnRestart;
+                @ToggleHUD.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleHUD;
+                @ToggleHUD.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleHUD;
+                @ToggleHUD.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleHUD;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -429,6 +454,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @Restart.started += instance.OnRestart;
                 @Restart.performed += instance.OnRestart;
                 @Restart.canceled += instance.OnRestart;
+                @ToggleHUD.started += instance.OnToggleHUD;
+                @ToggleHUD.performed += instance.OnToggleHUD;
+                @ToggleHUD.canceled += instance.OnToggleHUD;
             }
         }
     }
@@ -447,5 +475,6 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         void OnVolUp(InputAction.CallbackContext context);
         void OnVolDown(InputAction.CallbackContext context);
         void OnRestart(InputAction.CallbackContext context);
+        void OnToggleHUD(InputAction.CallbackContext context);
     }
 }

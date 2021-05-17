@@ -26,6 +26,7 @@ public class PlayerCar : MonoBehaviour
     Radio radio;
     public AudioSource engine;
     bool r3 = false;
+    Quaternion cameraDefaultRotation;
 
     public float TimeNow { get; set; } = 0f;
 
@@ -140,9 +141,11 @@ public class PlayerCar : MonoBehaviour
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
         radio = GetComponent<Radio>();
+        cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
+        ResetCamera();
         InvokeRepeating("Timer", 0f, tick);
 
-        myCamera.transform.position = new Vector3(transform.position.x - 0.1f, transform.position.y + 0.8f, transform.position.z - 0.6f);
+        myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);
         InvokeRepeating("CheckPedals", 0.1f, 0.1f);
 
         if (build)
@@ -228,13 +231,17 @@ public class PlayerCar : MonoBehaviour
     void ResetCamera()
     {
         if(!r3)
-            myCamera.transform.localRotation = Quaternion.identity;
+            myCamera.transform.localRotation = cameraDefaultRotation;
     }
 
     void ReverseCamera()
     {
+        float heightDiff = 0.002f;
         myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
         r3 = !r3;
+        if (r3)
+            myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y + heightDiff, myCamera.transform.localPosition.z);
+        else myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y - heightDiff, myCamera.transform.localPosition.z);
     }
 
     void Timer()

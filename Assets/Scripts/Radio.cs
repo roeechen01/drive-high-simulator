@@ -34,6 +34,8 @@ public class Radio : MonoBehaviour
 
         controls.Gameplay.NextStation.performed += ctx => NextStation();
         controls.Gameplay.PreviousStation.performed += ctx => PreviousStation();
+
+        controls.Gameplay.ToggleHUD.performed += ctx => ToggleHUD();
     }
 
     void Start()
@@ -219,5 +221,12 @@ public class Radio : MonoBehaviour
         else minutesString = minutes.ToString();
 
         clockText.text = hoursString + ":" + minutesString;
+    }
+
+    void ToggleHUD()
+    {
+        Text[] hudTexts = {radioText, clockText, speedText };
+        foreach (Text hudText in hudTexts)
+            hudText.enabled = !hudText.enabled;
     }
 }

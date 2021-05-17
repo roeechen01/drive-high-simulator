@@ -8,7 +8,6 @@ public class LightCycle : MonoBehaviour
     float changeIntensity;
     float maxBrightness = 1.25f;
 
-    // Start is called before the first frame update
     void Start()
     {
         directionalLight = this.GetComponent<Light>();
@@ -34,5 +33,7 @@ public class LightCycle : MonoBehaviour
             directionalLight.intensity = 0f;
         else
             directionalLight.intensity = time * changeIntensity;
+        float color = directionalLight.intensity / maxBrightness;
+        directionalLight.color = new Color(color, color, color);
     }
 }
