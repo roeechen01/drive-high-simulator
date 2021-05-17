@@ -12,11 +12,15 @@ public class Radio : MonoBehaviour
     [SerializeField] string[] radioStationsNames;
     [SerializeField] Font[] radioStationsFonts;
     [SerializeField] Text radioText;
+    [SerializeField] Text clockText;
+    public Text speedText;
     public AudioClip[] radioStations;
     public AudioClip[] freestyleBeats;
     readonly bool shuffleBeatsEveryLoop = false; //Change frestyle beats order every loop finish
     int freestyleBeatIndex = 0;
     int stationIndex = 0;
+    float clockTime = 0f;
+    float minuteTime = 1f;
 
     private void Awake()
     {
@@ -34,6 +38,9 @@ public class Radio : MonoBehaviour
     void Start()
     {
         playerCar = GetComponent<PlayerCar>();
+        clockTime = Random.Range(0, 1441);
+        SetClock();
+        InvokeRepeating("AddMinute", minuteTime, minuteTime);
         ShuffleArray(freestyleBeats);
         radio.volume = 0.5f;
         float maxLength = 0f;
@@ -185,5 +192,29 @@ public class Radio : MonoBehaviour
             arr[rnd] = arr[i];
             arr[i] = other;
         }
+    }
+
+    void AddMinute()
+    {
+        clockTime += 1f;
+        if (clockTime >= 1440)
+            clockTime = 0;
+        SetClock();
+    }
+
+    void SetClock()
+    {
+        float hours = (int)clockTime / 60;
+        float minutes = clockTime - hours * 60;
+        string hoursString, minutesString;
+        if (hours < 10)
+            hoursString = "0" + hours;
+        else hoursString = hours.ToString();
+
+        if (minutes < 10)
+            minutesString = "0" + minutes;
+        else minutesString = minutes.ToString();
+
+        clockText.text = hoursString + ":" + minutesString;
     }
 }

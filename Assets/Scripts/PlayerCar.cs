@@ -26,7 +26,9 @@ public class PlayerCar : MonoBehaviour
     Radio radio;
     public AudioSource engine;
     bool r3 = false;
-    
+
+    public float TimeNow { get; set; } = 0f;
+
 
     private void Awake()
     {
@@ -109,6 +111,15 @@ public class PlayerCar : MonoBehaviour
         //if (currentSound <= soundAddition && Mathf.Abs(currentSpeed) > 0)
         // currentSound = (Mathf.Abs(currentSpeed) / -1 * reverseMax) * 100;
         engine.volume = 0.3f/*0.8f*/ * (currentSound / 100);
+
+        if(currentSpeed >= 0)
+        {
+            float maxSpeed = 120;
+            float speedInKph = (Mathf.Abs(currentSpeed) / gasMax) * maxSpeed;
+            radio.speedText.text = Math.Round(speedInKph).ToString();
+        }
+        else radio.speedText.text = "R";
+
     }
 
     void Update()
@@ -225,8 +236,6 @@ public class PlayerCar : MonoBehaviour
         myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
         r3 = !r3;
     }
-
-    public float TimeNow { get; set; } = 0f;
 
     void Timer()
     {
