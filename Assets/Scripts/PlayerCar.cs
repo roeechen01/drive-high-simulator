@@ -172,7 +172,7 @@ public class PlayerCar : MonoBehaviour
                     if (myCamera.transform.localRotation.eulerAngles.y >= 85)
                         myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y + back, 0f);
                 }
-                if (myCamera.transform.localRotation.eulerAngles.x < 75 || myCamera.transform.localRotation.eulerAngles.x > 285)
+                if (Mathf.Abs(view.y) > 0.2f && myCamera.transform.localRotation.eulerAngles.x < 75 || myCamera.transform.localRotation.eulerAngles.x > 285)
                 {
                     myCamera.transform.Rotate(new Vector3(-view.y, 0, 0) * cameraSpeedUpDown * Time.deltaTime);
                 }

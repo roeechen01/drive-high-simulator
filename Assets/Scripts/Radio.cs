@@ -17,6 +17,7 @@ public class Radio : MonoBehaviour
     [SerializeField] LightCycle lightCycle;
     public Text speedText;
     public AudioClip[] radioStations;
+    float[] stationsDelays;
     public AudioClip[] freestyleBeats;
     readonly bool shuffleBeatsEveryLoop = false; //Change frestyle beats order every loop finish
     int freestyleBeatIndex = 0;
@@ -52,6 +53,11 @@ public class Radio : MonoBehaviour
         for (int i = 0; i < radioStations.Length; i++)
             if (radioStations[i].length > maxLength)
                 maxLength = radioStations[i].length;
+        stationsDelays = new float[radioStations.Length];
+        for (int i = 0; i < stationsDelays.Length; i++)
+        {
+            stationsDelays[i] = Random.Range(0, maxLength);
+        }
         playerCar.TimeNow = Random.Range(0, maxLength);
         PlayStation(stationIndex, playerCar.TimeNow);
     }
@@ -120,11 +126,11 @@ public class Radio : MonoBehaviour
             float stationLength = radioStations[stationIndex].length;
             radio.time = 0;
             radio.clip = radioStations[index];
-            if (time < stationLength)
+            if (time + stationsDelays[index] < stationLength)
                 radio.time = time;
             else
             {
-                float timeCopy = time;
+                float timeCopy = time + stationsDelays[index];
                 while (timeCopy > stationLength)
                     timeCopy -= stationLength;
                 radio.time = timeCopy;
