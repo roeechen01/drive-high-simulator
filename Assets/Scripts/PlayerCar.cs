@@ -21,12 +21,15 @@ public class PlayerCar : MonoBehaviour
     Vector2 view;
     float gasAmount;
     float reverseAmount;
-    public bool build = false;
+    //public bool build = false;
     public float buildDifference = 5.5f;
     Radio radio;
     public AudioSource engine;
     bool r3 = false;
     Quaternion cameraDefaultRotation;
+    bool onRoad = true;
+    bool onHardCollision = false;
+    float notOnRoadDiff = 0.75f;
 
     public float TimeNow { get; set; } = 0f;
 
@@ -113,11 +116,18 @@ public class PlayerCar : MonoBehaviour
         // currentSound = (Mathf.Abs(currentSpeed) / -1 * reverseMax) * 100;
         engine.volume = 0.3f/*0.8f*/ * (currentSound / 100);
 
+       // if (this.myRigidbody.velocity == Vector3.zero)
+           // currentSpeed = 0;
+
         if(currentSpeed >= 0)
         {
             float maxSpeed = 120;
             float speedInKph = (Mathf.Abs(currentSpeed) / gasMax) * maxSpeed;
-            radio.speedText.text = "KPH: " + Math.Round(speedInKph).ToString();
+            if(onHardCollision)
+                radio.speedText.text = "KPH: " + 0;
+            else if(onRoad)
+                radio.speedText.text = "KPH: " + Math.Round(speedInKph).ToString();
+            else radio.speedText.text = "KPH: " + Math.Round((notOnRoadDiff * speedInKph)).ToString();
         }
         else radio.speedText.text = "R";
 
@@ -133,7 +143,9 @@ public class PlayerCar : MonoBehaviour
     {
         if (currentSpeed != 0)
             transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-        myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
+        if(onRoad)
+            myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
+        else myRigidbody.velocity = transform.forward * (currentSpeed * notOnRoadDiff) * Time.deltaTime;
     }
 
     void Start()
@@ -148,7 +160,10 @@ public class PlayerCar : MonoBehaviour
         myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);
         InvokeRepeating("CheckPedals", 0.1f, 0.1f);
 
-        if (build)
+        /*if (build)
+            speedAddition /= buildDifference;
+        else buildDifference = 1;*/
+        if (!Application.isEditor)
             speedAddition /= buildDifference;
         else buildDifference = 1;
     }
@@ -249,4 +264,35 @@ public class PlayerCar : MonoBehaviour
         TimeNow += tick;
         radio.CheckForNextFreestyleBeat();
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Hard")
+        {
+            onHardCollision = true;
+            currentSpeed = 0;
+        }
+
+       
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Hard")
+            onHardCollision = false;
+    }
+
+    /*void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Road")
+            onRoad = true;
+        print("enter");
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Road")
+            onRoad = false;
+        print("exit");
+    }*/
 }

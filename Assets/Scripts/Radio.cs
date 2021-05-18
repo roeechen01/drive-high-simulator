@@ -214,7 +214,10 @@ public class Radio : MonoBehaviour
         else clockText.enabled = radioText.enabled;
     }
 
-    static int counter = 138;
+    static float counter = 138;
+    //float greenerCounter = 20;
+    //float greenStep = 0.01931373f / 2;
+    //float otherStep = 0.049f / 2;
     float step = 0.0035f;
     float timeToChange = 0.125f;
     void AddMinute()
@@ -228,8 +231,26 @@ public class Radio : MonoBehaviour
         clockTime += 1f;
         if (clockTime >= dayMinutes)
             clockTime = 0;
-        if (clockTime == 260 || clockTime == 980)
+       if((clockTime >= 240 && clockTime < 260) || (clockTime >= 960 && clockTime < 980))
         {
+            /*if (!IsInvoking("Greener"))
+            {
+                if (clockTime >= 240 && clockTime < 260)
+                    greenerCounter -= 260 - clockTime;
+                else
+                    greenerCounter -= 980 - clockTime;
+                clockText.color = new Color(clockText.color.r - (20 - greenerCounter) * otherStep, clockText.color.g - (20 - greenerCounter) * greenStep, clockText.color.b - (20 - greenerCounter) * otherStep);
+                if (clockText.color.r > 1f - otherStep)
+                    clockText.color = new Color(0f, clockText.color.g, clockText.color.b);
+                if (clockText.color.b > 1f - otherStep)
+                    clockText.color = new Color(clockText.color.r, clockText.color.g, 0f);
+                InvokeRepeating("Greener", minuteTime, minuteTime);
+            }*/
+        }
+        else if (clockTime == 260 || clockTime == 980)
+        {
+            if (IsInvoking("Greener"))
+                CancelInvoke("Greener");
             clockText.color = new Color(0f, 0.5f, 0f);
             InvokeRepeating("IncreaseClockSize", timeToChange, timeToChange);
             CancelInvoke("AddMinute");
@@ -243,6 +264,25 @@ public class Radio : MonoBehaviour
         SetClock();
         lightCycle.UpdateLight(clockTime);
     }
+
+    /*void Greener()
+    {
+        clockText.color = new Color(clockText.color.r - otherStep, clockText.color.g - greenStep, clockText.color.b - otherStep);
+
+        if (clockText.color.r > 1f - otherStep)
+            clockText.color = new Color(0f, clockText.color.g, clockText.color.b);
+        if (clockText.color.b > 1f - otherStep)
+            clockText.color = new Color(clockText.color.r, clockText.color.g, 0f);
+
+        greenerCounter--;
+        if(greenerCounter <= 0)
+        {
+            greenerCounter = 20;
+            CancelInvoke("Greener");
+        }
+        print(clockText.color.g);
+            
+    }*/
 
     
     void IncreaseClockSize()
