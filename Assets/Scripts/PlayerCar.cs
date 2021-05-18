@@ -117,7 +117,7 @@ public class PlayerCar : MonoBehaviour
         {
             float maxSpeed = 120;
             float speedInKph = (Mathf.Abs(currentSpeed) / gasMax) * maxSpeed;
-            radio.speedText.text = Math.Round(speedInKph).ToString();
+            radio.speedText.text = "KPH: " + Math.Round(speedInKph).ToString();
         }
         else radio.speedText.text = "R";
 

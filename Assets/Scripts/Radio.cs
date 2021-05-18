@@ -13,6 +13,7 @@ public class Radio : MonoBehaviour
     [SerializeField] Font[] radioStationsFonts;
     [SerializeField] Text radioText;
     [SerializeField] Text clockText;
+    Vector3 baseClockScale;
     [SerializeField] LightCycle lightCycle;
     public Text speedText;
     public AudioClip[] radioStations;
@@ -21,7 +22,7 @@ public class Radio : MonoBehaviour
     int freestyleBeatIndex = 0;
     int stationIndex = 0;
     float clockTime = 0f;
-    public static float minuteTime = 0.1f;
+    public static float minuteTime = 1f;
 
     private void Awake()
     {
@@ -42,8 +43,9 @@ public class Radio : MonoBehaviour
     {
         playerCar = GetComponent<PlayerCar>();
         clockTime = Random.Range(0, 1441);
+        baseClockScale = clockText.transform.localScale;
         SetClock();
-        InvokeRepeating("AddMinute", minuteTime, minuteTime);
+        InvokeRepeating("AddMinute", 0f, minuteTime);
         ShuffleArray(freestyleBeats);
         radio.volume = 0.5f;
         float maxLength = 0f;
@@ -197,15 +199,69 @@ public class Radio : MonoBehaviour
         }
     }
 
+    void Update()
+    {
+        if (clockTime == 260 || clockTime == 980)
+        {
+            clockText.enabled = true;
+        }
+        else clockText.enabled = radioText.enabled;
+    }
+
+    static int counter = 138;
+    float step = 0.0035f;
+    float timeToChange = 0.125f;
     void AddMinute()
     {
+        if (IsInvoking("IncreaseClockSize"))
+            CancelInvoke("IncreaseClockSize");
+        else if (IsInvoking("DecreaseClockSize"))
+            CancelInvoke("DecreaseClockSize");
+
         float dayMinutes = 1440;
         clockTime += 1f;
         if (clockTime >= dayMinutes)
             clockTime = 0;
+        if (clockTime == 260 || clockTime == 980)
+        {
+            clockText.color = new Color(0f, 0.5f, 0f);
+            InvokeRepeating("IncreaseClockSize", timeToChange, timeToChange);
+            CancelInvoke("AddMinute");
+            InvokeRepeating("AddMinute", 69f, minuteTime);
+        }
+        else
+        {
+            clockText.color = new Color(245f / 255f, 226f / 255f, 223f / 255f);
+            clockText.transform.localScale = baseClockScale;
+        }
         SetClock();
         lightCycle.UpdateLight(clockTime);
     }
+
+    
+    void IncreaseClockSize()
+    {
+        clockText.transform.localScale += new Vector3(step, step, step);
+        counter--;
+        if(counter <= 0)
+        {
+            CancelInvoke("IncreaseClockSize");
+            InvokeRepeating("DecreaseClockSize", timeToChange, timeToChange);
+        }    
+    }
+
+    void DecreaseClockSize()
+    {
+        clockText.transform.localScale -= new Vector3(step, step, step);
+        counter++;
+        if (counter >= 138)
+        {
+            CancelInvoke("DecreaseClockSize");
+            InvokeRepeating("IncreaseClockSize", timeToChange, timeToChange);
+        }
+    }
+
+
 
     void SetClock()
     {
