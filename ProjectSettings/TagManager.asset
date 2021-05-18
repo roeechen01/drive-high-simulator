@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Road
   - Hard
+  - Soft
   layers:
   - Default
   - TransparentFX

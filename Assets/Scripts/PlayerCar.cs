@@ -272,6 +272,18 @@ public class PlayerCar : MonoBehaviour
             onHardCollision = true;
             currentSpeed = 0;
         }
+        if (collision.gameObject.tag == "Soft")
+        {
+            float multiplier = 1f;
+            if (collision.gameObject.GetComponent<Rigidbody>())
+            {
+                multiplier = this.myRigidbody.mass - collision.gameObject.GetComponent<Rigidbody>().mass;
+                currentSpeed *= multiplier;
+                print("entered");
+            }
+                
+        }
+            
 
        
     }
