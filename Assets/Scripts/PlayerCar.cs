@@ -265,12 +265,13 @@ public class PlayerCar : MonoBehaviour
 
     void CheckFlying()
     {
-        if (Mathf.Abs(myRigidbody.velocity.y) > 0.01f)
+        if (Mathf.Abs(myRigidbody.velocity.y) > 0.1f)
         {
             transform.position = lastPosition;
             myRigidbody.velocity = Vector3.zero;
             currentSpeed = 0f;
             transform.rotation = lastRotation;
+            print("fixing!");
         }
         else UpdatePositions();
     }
@@ -301,11 +302,14 @@ public class PlayerCar : MonoBehaviour
                 multiplier = this.myRigidbody.mass - collisionObject.GetComponent<Rigidbody>().mass;
                 currentSpeed *= multiplier;
             }
-        }
-        
-            
+        }  
+    }
 
-       
+    private void OnCollisionStay(Collision collision)
+    {
+        GameObject collisionObject = collision.gameObject;
+        if (collisionObject.tag == "Road")
+            onRoad = true;
     }
 
     private void OnCollisionExit(Collision collision)
@@ -313,14 +317,13 @@ public class PlayerCar : MonoBehaviour
         GameObject collisionObject = collision.gameObject;
         if (collision.gameObject.tag == "MassObjects" && collisionObject.GetComponent<Rigidbody>() && collisionObject.GetComponent<Rigidbody>().mass == 1)
             onHardCollision = false;
+        if (collisionObject.tag == "Road")
+            onRoad = false;
     }
 
     void OnTriggerEnter(Collider other)
     {
         GameObject collisionObject = other.gameObject;
-        /*if (other.gameObject.tag == "Road")
-            onRoad = true;
-        print("enter");*/
         if (collisionObject.CompareTag("Flower"))
         {
             if(collisionObject.name.Substring(0, 5) == "Daisy")
@@ -331,8 +334,6 @@ public class PlayerCar : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        /*if (other.gameObject.tag == "Road")
-            onRoad = false;
-        print("exit");*/
+
     }
 }
