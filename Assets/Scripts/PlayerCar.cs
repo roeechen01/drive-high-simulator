@@ -30,6 +30,9 @@ public class PlayerCar : MonoBehaviour
     bool onRoad = true;
     bool onHardCollision = false;
     float notOnRoadDiff = 0.75f;
+    Vector3 lastVelocity;
+    Vector3 lastPosition;
+    Quaternion lastRotation;
 
     public float TimeNow { get; set; } = 0f;
 
@@ -156,6 +159,7 @@ public class PlayerCar : MonoBehaviour
         cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
         ResetCamera();
         InvokeRepeating("Timer", 0f, tick);
+        InvokeRepeating("CheckFlying", 0.5f, 0.5f);
 
         myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);
         InvokeRepeating("CheckPedals", 0.1f, 0.1f);
@@ -259,6 +263,25 @@ public class PlayerCar : MonoBehaviour
         else myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y - heightDiff, myCamera.transform.localPosition.z);
     }
 
+    void CheckFlying()
+    {
+        if (Mathf.Abs(myRigidbody.velocity.y) > 0.01f)
+        {
+            transform.position = lastPosition;
+            myRigidbody.velocity = Vector3.zero;
+            currentSpeed = 0f;
+            transform.rotation = lastRotation;
+        }
+        else UpdatePositions();
+    }
+
+    void UpdatePositions()
+    {
+        lastPosition = transform.position;
+        lastRotation = transform.rotation;
+        lastVelocity = myRigidbody.velocity;
+    }
+
     void Timer()
     {
         TimeNow += tick;
@@ -267,22 +290,19 @@ public class PlayerCar : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Hard")
-        {
-            onHardCollision = true;
-            currentSpeed = 0;
-        }
-        if (collision.gameObject.tag == "Soft")
+        GameObject collisionObject = collision.gameObject;
+        if (collisionObject.CompareTag("MassObjects"))
         {
             float multiplier = 1f;
-            if (collision.gameObject.GetComponent<Rigidbody>())
+            if (collisionObject.GetComponent<Rigidbody>())
             {
-                multiplier = this.myRigidbody.mass - collision.gameObject.GetComponent<Rigidbody>().mass;
+                if (collisionObject.GetComponent<Rigidbody>().mass == 1)
+                    onHardCollision = true;
+                multiplier = this.myRigidbody.mass - collisionObject.GetComponent<Rigidbody>().mass;
                 currentSpeed *= multiplier;
-                print("entered");
             }
-                
         }
+        
             
 
        
@@ -290,21 +310,29 @@ public class PlayerCar : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.tag == "Hard")
+        GameObject collisionObject = collision.gameObject;
+        if (collision.gameObject.tag == "MassObjects" && collisionObject.GetComponent<Rigidbody>() && collisionObject.GetComponent<Rigidbody>().mass == 1)
             onHardCollision = false;
     }
 
-    /*void OnTriggerEnter(Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.tag == "Road")
+        GameObject collisionObject = other.gameObject;
+        /*if (other.gameObject.tag == "Road")
             onRoad = true;
-        print("enter");
+        print("enter");*/
+        if (collisionObject.CompareTag("Flower"))
+        {
+            if(collisionObject.name.Substring(0, 5) == "Daisy")
+                collisionObject.transform.localScale = new Vector3(collisionObject.transform.localScale.x, collisionObject.transform.localScale.y / 5, collisionObject.transform.localScale.z);
+            else collisionObject.transform.localScale = new Vector3(collisionObject.transform.localScale.x * 2f, collisionObject.transform.localScale.y / 5, collisionObject.transform.localScale.z * 2f);
+        }
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.tag == "Road")
+        /*if (other.gameObject.tag == "Road")
             onRoad = false;
-        print("exit");
-    }*/
+        print("exit");*/
+    }
 }
