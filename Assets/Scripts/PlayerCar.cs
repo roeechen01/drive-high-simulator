@@ -7,6 +7,10 @@ using System;
 public class PlayerCar : MonoBehaviour
 {
     Camera myCamera;
+    public AudioSource carSounds;
+    [SerializeField] AudioClip[] lightCrashSounds;
+    [SerializeField]  AudioClip[] heavyCrashSounds;
+    [SerializeField] AudioClip carCrash;
     Rigidbody myRigidbody;
     float tick = 0.1f;
     float soundAddition = 2f;
@@ -21,7 +25,6 @@ public class PlayerCar : MonoBehaviour
     Vector2 view;
     float gasAmount;
     float reverseAmount;
-    //public bool build = false;
     public float buildDifference = 5.5f;
     Radio radio;
     public AudioSource engine;
@@ -63,9 +66,11 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    float gasMax;
     void CheckPedals()
     {
-        float reverseMax = -7500f / buildDifference, gasMax = 15000f / buildDifference, noGasDiv = 15f, minSound = 10f;
+        float reverseMax = -7500f / buildDifference, noGasDiv = 15f, minSound = 10f;
+        gasMax = 15000f / buildDifference;
 
         if (!(reverseAmount > 0.2f) || !(gasAmount > 0.2f) || !(currentSpeed == 0))
         {
@@ -164,9 +169,6 @@ public class PlayerCar : MonoBehaviour
         myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);
         InvokeRepeating("CheckPedals", 0.1f, 0.1f);
 
-        /*if (build)
-            speedAddition /= buildDifference;
-        else buildDifference = 1;*/
         if (!Application.isEditor)
             speedAddition /= buildDifference;
         else buildDifference = 1;
@@ -265,13 +267,13 @@ public class PlayerCar : MonoBehaviour
 
     void CheckFlying()
     {
-        if (Mathf.Abs(myRigidbody.velocity.y) > 0.1f)
+        if (Mathf.Abs(myRigidbody.velocity.y) > 0.2f)
         {
             transform.position = lastPosition;
             myRigidbody.velocity = Vector3.zero;
             currentSpeed = 0f;
             transform.rotation = lastRotation;
-            print("fixing!");
+            //print("fixing!");
         }
         else UpdatePositions();
     }
@@ -288,17 +290,47 @@ public class PlayerCar : MonoBehaviour
         TimeNow += tick;
         radio.CheckForNextFreestyleBeat();
     }
-
+    void SetCrash()
+    {
+    }
     private void OnCollisionEnter(Collision collision)
     {
         GameObject collisionObject = collision.gameObject;
         if (collisionObject.CompareTag("MassObjects"))
         {
             float multiplier = 1f;
+            float soundMultiplier = 1f;
             if (collisionObject.GetComponent<Rigidbody>())
             {
+                float insigignificant = gasMax / 3.5f;
                 if (collisionObject.GetComponent<Rigidbody>().mass == 1)
+                {
                     onHardCollision = true;
+                    if (collisionObject.gameObject.GetComponent<ScenaryCar>() && currentSpeed > insigignificant)
+                    {
+                        carSounds.clip = carCrash;
+                    }
+                    else
+                    {
+                        if (currentSpeed < insigignificant)
+                            carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
+                        else carSounds.clip = heavyCrashSounds[UnityEngine.Random.Range(0, heavyCrashSounds.Length)];
+                    }
+                    soundMultiplier = collisionObject.GetComponent<Rigidbody>().mass;
+                }
+
+                else
+                {
+                    carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
+                }
+
+                
+                if (!IsInvoking("SetCrash")) {
+                    soundMultiplier *= Mathf.Abs(currentSpeed) / 15000f;
+                    carSounds.volume = soundMultiplier;
+                    carSounds.Play(); 
+                }
+
                 multiplier = this.myRigidbody.mass - collisionObject.GetComponent<Rigidbody>().mass;
                 currentSpeed *= multiplier;
             }
@@ -308,6 +340,12 @@ public class PlayerCar : MonoBehaviour
     private void OnCollisionStay(Collision collision)
     {
         GameObject collisionObject = collision.gameObject;
+
+        if (collisionObject.CompareTag("MassObjects"))
+        {
+            Invoke("SetCrash", 1f);
+        }
+
         if (collisionObject.tag == "Road")
             onRoad = true;
     }
@@ -330,10 +368,5 @@ public class PlayerCar : MonoBehaviour
                 collisionObject.transform.localScale = new Vector3(collisionObject.transform.localScale.x, collisionObject.transform.localScale.y / 5, collisionObject.transform.localScale.z);
             else collisionObject.transform.localScale = new Vector3(collisionObject.transform.localScale.x * 2f, collisionObject.transform.localScale.y / 5, collisionObject.transform.localScale.z * 2f);
         }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-
     }
 }
