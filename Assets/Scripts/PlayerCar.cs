@@ -68,10 +68,10 @@ public class PlayerCar : MonoBehaviour
     }
 
     float gasMax;
-    float breaksForSound = 0.75f;
-    bool finishedBreaks = true;
-    void PlayBreaks() {
-        if(reverseAmount >= breaksForSound && !IsInvoking("SetCrash") && finishedBreaks)
+    float brakesForSound = 0.75f;
+    bool finishedBrakes = true;
+    void PlayBrakes() {
+        if(reverseAmount >= brakesForSound && !IsInvoking("SetCrash") && finishedBrakes)
         {
             carSounds.Stop();
             carSounds.clip = breaksSounds[UnityEngine.Random.Range(0, breaksSounds.Length)];
@@ -81,7 +81,7 @@ public class PlayerCar : MonoBehaviour
                 carSounds.volume = reverseAmount * (currentSpeed / gasMax);
 
             carSounds.Play();
-            finishedBreaks = false;
+            finishedBrakes = false;
         }
     }
 
@@ -92,16 +92,16 @@ public class PlayerCar : MonoBehaviour
        
         if (/*!*/(reverseAmount > 0.2f) || /*!*/(gasAmount > 0.2f) || !(currentSpeed == 0))
         {
-            if (reverseAmount < breaksForSound)
-                finishedBreaks = true;
+            if (reverseAmount < brakesForSound)
+                finishedBrakes = true;
 
             if (reverseAmount > 0.2f && currentSpeed > reverseMax)
             {
                 if (currentSpeed > 0)
                 {
-                    if(reverseAmount >= breaksForSound && currentSpeed > 0.225f * gasMax && !IsInvoking("BreaksCooldown"))
+                    if(reverseAmount >= brakesForSound && currentSpeed > 0.225f * gasMax && !IsInvoking("BreaksCooldown"))
                     {
-                        Invoke("PlayBreaks", 0.25f);
+                        Invoke("PlayBrakes", 0.25f);
                     }
                     currentSpeed -= speedAddition * reverseAmount * 2;
                     currentSound -= soundAddition * 2;
