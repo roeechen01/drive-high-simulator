@@ -337,31 +337,35 @@ public class PlayerCar : MonoBehaviour
                     onHardCollision = true;
                     if (collisionObject.gameObject.GetComponent<ScenaryCar>() && currentSpeed > insigignificant)
                     {
-                        carSounds.clip = carCrash;
+                        if (!IsInvoking("SetCrash") && !carSounds.isPlaying)
+                            carSounds.clip = carCrash;
                     }
                     else
                     {
                         if (currentSpeed < insigignificant)
                         {
                             cameraShake.Shake((currentSpeed / gasMax), 0.15f);
-                            carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
+                            if (!IsInvoking("SetCrash") && !carSounds.isPlaying)
+                                carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
                         }
                             
                         else {
                             cameraShake.Shake((currentSpeed / gasMax), 0.2f);
-                            carSounds.clip = heavyCrashSounds[UnityEngine.Random.Range(0, heavyCrashSounds.Length)];
+                            if (!IsInvoking("SetCrash") && !carSounds.isPlaying)
+                                carSounds.clip = heavyCrashSounds[UnityEngine.Random.Range(0, heavyCrashSounds.Length)];
                         }
                     }
                 }
 
                 else
                 {
-                    carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
+                    if (!IsInvoking("SetCrash") && !carSounds.isPlaying)
+                        carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
                     cameraShake.Shake((currentSpeed / gasMax) * mass, 0.15f);
                 }
 
-                
-                if (!IsInvoking("SetCrash")) {
+                if (!IsInvoking("SetCrash") && !carSounds.isPlaying) {
+
                     soundMultiplier *= Mathf.Abs(currentSpeed) / 15000f;
                     carSounds.volume = soundMultiplier;
                     carSounds.Play(); 

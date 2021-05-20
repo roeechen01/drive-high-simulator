@@ -2198,11 +2198,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   carSounds: {fileID: 216346455}
   lightCrashSounds:
-  - {fileID: 8300000, guid: f458313b2afa7944c8dd39a59b057de4, type: 3}
-  - {fileID: 8300000, guid: a5b8f22d86328d846a26ad01d21537db, type: 3}
+  - {fileID: 8300000, guid: 74b0b8972ad89a94cb1c7b2fcdd1451c, type: 3}
+  - {fileID: 8300000, guid: 3635025a16ffb9c41896e2e8ba961a77, type: 3}
   heavyCrashSounds:
-  - {fileID: 8300000, guid: f23c49baec1121540b1f5a84772159c6, type: 3}
-  - {fileID: 8300000, guid: 1346a70e7172bb944b5e5f9958210485, type: 3}
+  - {fileID: 8300000, guid: 6a1d1f2c40c797c4eaffbb6fda7512de, type: 3}
+  - {fileID: 8300000, guid: 34e1e589753420f4fb93a4918c1a8f46, type: 3}
   breaksSounds:
   - {fileID: 8300000, guid: b9e9a36e26bfe9b4bb0f8623f8fc4ae3, type: 3}
   - {fileID: 8300000, guid: f0d93ef644d42684a9d3f553e6707b0a, type: 3}
@@ -2210,7 +2210,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 1305010120edf4a4091f0c478dcd095c, type: 3}
   - {fileID: 8300000, guid: cfc2ead316414d9459f38069c9b52609, type: 3}
   - {fileID: 8300000, guid: 5432490032e77954c870b2965043e368, type: 3}
-  carCrash: {fileID: 8300000, guid: 6286288716e3f7f4c9254d93973755fb, type: 3}
+  carCrash: {fileID: 8300000, guid: db099e894532bd947a4471ffaa5c74cf, type: 3}
   buildDifference: 5.5
   engine: {fileID: 216346452}
 --- !u!54 &216346450
@@ -8646,8 +8646,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e38c7ec394b30e949868e2cac15ef3d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shakeDuration: 1
-  decreaseFactor: 1
 --- !u!114 &968598757
 MonoBehaviour:
   m_ObjectHideFlags: 0
