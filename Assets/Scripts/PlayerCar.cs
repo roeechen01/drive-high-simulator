@@ -7,6 +7,7 @@ using System;
 public class PlayerCar : MonoBehaviour
 {
     Camera myCamera;
+    CameraShake cameraShake;
     public AudioSource carSounds;
     [SerializeField] AudioClip[] lightCrashSounds;
     [SerializeField]  AudioClip[] heavyCrashSounds;
@@ -185,6 +186,7 @@ public class PlayerCar : MonoBehaviour
     {
         myRigidbody = GetComponent<Rigidbody>();
         myCamera = FindObjectOfType<Camera>();
+        cameraShake = myCamera.GetComponent<CameraShake>();
         radio = GetComponent<Radio>();
         cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
         ResetCamera();
@@ -328,8 +330,9 @@ public class PlayerCar : MonoBehaviour
             if (collisionObject.GetComponent<Rigidbody>())
             {
                 float insigignificant = gasMax / 3.5f;
-                soundMultiplier = collisionObject.GetComponent<Rigidbody>().mass;
-                if (collisionObject.GetComponent<Rigidbody>().mass == 1)
+                float mass = collisionObject.GetComponent<Rigidbody>().mass;
+                soundMultiplier = mass;
+                if (mass == 1)
                 {
                     onHardCollision = true;
                     if (collisionObject.gameObject.GetComponent<ScenaryCar>() && currentSpeed > insigignificant)
@@ -339,14 +342,22 @@ public class PlayerCar : MonoBehaviour
                     else
                     {
                         if (currentSpeed < insigignificant)
+                        {
+                            cameraShake.Shake((currentSpeed / gasMax), 0.15f);
                             carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
-                        else carSounds.clip = heavyCrashSounds[UnityEngine.Random.Range(0, heavyCrashSounds.Length)];
+                        }
+                            
+                        else {
+                            cameraShake.Shake((currentSpeed / gasMax), 0.2f);
+                            carSounds.clip = heavyCrashSounds[UnityEngine.Random.Range(0, heavyCrashSounds.Length)];
+                        }
                     }
                 }
 
                 else
                 {
                     carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
+                    cameraShake.Shake((currentSpeed / gasMax) * mass, 0.15f);
                 }
 
                 
