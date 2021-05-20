@@ -15,7 +15,7 @@ public class PlayerCar : MonoBehaviour
     Rigidbody myRigidbody;
     float tick = 0.1f;
     float soundAddition = 2f;
-    float speedAddition = 300f;
+    float speedAddition = 250f;
     float currentSound = 0f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
