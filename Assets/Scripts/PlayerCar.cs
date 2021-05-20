@@ -10,11 +10,12 @@ public class PlayerCar : MonoBehaviour
     public AudioSource carSounds;
     [SerializeField] AudioClip[] lightCrashSounds;
     [SerializeField]  AudioClip[] heavyCrashSounds;
+    [SerializeField] AudioClip[] breaksSounds;
     [SerializeField] AudioClip carCrash;
     Rigidbody myRigidbody;
     float tick = 0.1f;
     float soundAddition = 2f;
-    float speedAddition = 240f;
+    float speedAddition = 300f;
     float currentSound = 0f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
@@ -67,17 +68,41 @@ public class PlayerCar : MonoBehaviour
     }
 
     float gasMax;
+    float breaksForSound = 0.75f;
+    bool finishedBreaks = true;
+    void PlayBreaks() {
+        if(reverseAmount >= breaksForSound && !IsInvoking("SetCrash") && finishedBreaks)
+        {
+            carSounds.Stop();
+            carSounds.clip = breaksSounds[UnityEngine.Random.Range(0, breaksSounds.Length)];
+            if (reverseAmount * (currentSpeed / gasMax) > 1)
+                carSounds.volume = 1;
+            else
+                carSounds.volume = reverseAmount * (currentSpeed / gasMax);
+
+            carSounds.Play();
+            finishedBreaks = false;
+        }
+    }
+
     void CheckPedals()
     {
-        float reverseMax = -7500f / buildDifference, noGasDiv = 15f, minSound = 10f;
-        gasMax = 15000f / buildDifference;
-
-        if (!(reverseAmount > 0.2f) || !(gasAmount > 0.2f) || !(currentSpeed == 0))
+        gasMax = 18750f / buildDifference;
+        float reverseMax = -gasMax / 2, noGasDiv = 15f, minSound = 10f;
+       
+        if (/*!*/(reverseAmount > 0.2f) || /*!*/(gasAmount > 0.2f) || !(currentSpeed == 0))
         {
+            if (reverseAmount < breaksForSound)
+                finishedBreaks = true;
+
             if (reverseAmount > 0.2f && currentSpeed > reverseMax)
             {
                 if (currentSpeed > 0)
                 {
+                    if(reverseAmount >= breaksForSound && currentSpeed > 0.225f * gasMax && !IsInvoking("BreaksCooldown"))
+                    {
+                        Invoke("PlayBreaks", 0.25f);
+                    }
                     currentSpeed -= speedAddition * reverseAmount * 2;
                     currentSound -= soundAddition * 2;
                 }
@@ -303,6 +328,7 @@ public class PlayerCar : MonoBehaviour
             if (collisionObject.GetComponent<Rigidbody>())
             {
                 float insigignificant = gasMax / 3.5f;
+                soundMultiplier = collisionObject.GetComponent<Rigidbody>().mass;
                 if (collisionObject.GetComponent<Rigidbody>().mass == 1)
                 {
                     onHardCollision = true;
@@ -316,7 +342,6 @@ public class PlayerCar : MonoBehaviour
                             carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
                         else carSounds.clip = heavyCrashSounds[UnityEngine.Random.Range(0, heavyCrashSounds.Length)];
                     }
-                    soundMultiplier = collisionObject.GetComponent<Rigidbody>().mass;
                 }
 
                 else

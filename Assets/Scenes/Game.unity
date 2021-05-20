@@ -2203,6 +2203,13 @@ MonoBehaviour:
   heavyCrashSounds:
   - {fileID: 8300000, guid: f23c49baec1121540b1f5a84772159c6, type: 3}
   - {fileID: 8300000, guid: 1346a70e7172bb944b5e5f9958210485, type: 3}
+  breaksSounds:
+  - {fileID: 8300000, guid: b9e9a36e26bfe9b4bb0f8623f8fc4ae3, type: 3}
+  - {fileID: 8300000, guid: f0d93ef644d42684a9d3f553e6707b0a, type: 3}
+  - {fileID: 8300000, guid: bfc595f8dad549f4ab4116fb043d8e24, type: 3}
+  - {fileID: 8300000, guid: 1305010120edf4a4091f0c478dcd095c, type: 3}
+  - {fileID: 8300000, guid: cfc2ead316414d9459f38069c9b52609, type: 3}
+  - {fileID: 8300000, guid: 5432490032e77954c870b2965043e368, type: 3}
   carCrash: {fileID: 8300000, guid: 6286288716e3f7f4c9254d93973755fb, type: 3}
   buildDifference: 5.5
   engine: {fileID: 216346452}
