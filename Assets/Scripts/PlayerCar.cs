@@ -35,7 +35,6 @@ public class PlayerCar : MonoBehaviour
     bool onRoad = true;
     bool onHardCollision = false;
     float notOnRoadDiff = 0.75f;
-    Vector3 lastVelocity;
     Vector3 lastPosition;
     Quaternion lastRotation;
 
@@ -292,17 +291,46 @@ public class PlayerCar : MonoBehaviour
         else myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y - heightDiff, myCamera.transform.localPosition.z);
     }
 
+    int i = 0;
+    Vector3 oldPos;
+    Vector3 lastPos;
+    Vector3 lastVelocity;
+    Quaternion oldRot;
+    Quaternion lastRot;
     void CheckFlying()
     {
-        if (Mathf.Abs(myRigidbody.velocity.y) > 0.2f)
+        float overTheLine = 0.25f;
+        if (Mathf.Abs(myRigidbody.velocity.y) > overTheLine)
         {
-            transform.position = lastPosition;
-            myRigidbody.velocity = Vector3.zero;
-            currentSpeed = 0f;
-            transform.rotation = lastRotation;
-            //print("fixing!");
+            if(lastVelocity.y < overTheLine)
+            {
+                transform.position = lastPosition;
+                myRigidbody.velocity = Vector3.zero;
+                currentSpeed = 0f;
+                transform.rotation = lastRotation;
+                //print(" NOT OVER THE LINE!");
+            }
+            else
+            {
+                //print("OVER THE LINE!");
+                transform.position = oldPos;
+                myRigidbody.velocity = Vector3.zero;
+                currentSpeed = 0f;
+                transform.rotation = oldRot;
+            }
+           
         }
-        else UpdatePositions();
+        i++;
+        if (i == 10)
+        {
+            oldPos = lastPos;
+            oldRot = lastRot;
+            i = 0;
+        }
+        else if(i == 5)
+        {
+            UpdatePositions();
+        }
     }
 
     void UpdatePositions()
@@ -404,9 +432,14 @@ public class PlayerCar : MonoBehaviour
         GameObject collisionObject = other.gameObject;
         if (collisionObject.CompareTag("Flower"))
         {
-            if(collisionObject.name.Substring(0, 5) == "Daisy")
-                collisionObject.transform.localScale = new Vector3(collisionObject.transform.localScale.x, collisionObject.transform.localScale.y / 5, collisionObject.transform.localScale.z);
-            else collisionObject.transform.localScale = new Vector3(collisionObject.transform.localScale.x * 2f, collisionObject.transform.localScale.y / 5, collisionObject.transform.localScale.z * 2f);
+            Flower flower = collisionObject.GetComponent<Flower>();
+            if(flower.squishCounter > 0)
+            {
+                collisionObject.transform.localScale = new Vector3(collisionObject.transform.localScale.x * 2f, collisionObject.transform.localScale.y / 5, collisionObject.transform.localScale.z * 2f);
+                flower.squishCounter--;
+                flower.PlaySquish();
+            }
         }
+             
     }
 }
