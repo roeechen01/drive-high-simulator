@@ -13,8 +13,9 @@ public class PlayerCar : MonoBehaviour
     [SerializeField]  AudioClip[] heavyCrashSounds;
     [SerializeField] AudioClip[] breaksSounds;
     [SerializeField] AudioClip carCrash;
+    [SerializeField] FrontWheel frontLeft, frontRight;
     Rigidbody myRigidbody;
-    float tick = 0.1f;
+    readonly float tick = 0.1f;
     float soundAddition = 2f;
     float speedAddition = 250f;
     float currentSound = 0f;
@@ -37,6 +38,8 @@ public class PlayerCar : MonoBehaviour
     float notOnRoadDiff = 0.75f;
     Vector3 lastPosition;
     Quaternion lastRotation;
+    [SerializeField] bool fps = true;
+    [SerializeField] bool realDrive = false;
 
     public float TimeNow { get; set; } = 0f;
 
@@ -174,11 +177,41 @@ public class PlayerCar : MonoBehaviour
 
     private void ChangeSpeed()
     {
+        FrontWheel[] frontWheels = {frontLeft, frontRight };
+        foreach(FrontWheel frontWheel in frontWheels)
+        {
+            if (realDrive && Mathf.Abs(direction.x) < 0.1f)
+                frontWheel.transform.localRotation = Quaternion.identity;
+            else frontWheel.transform.localRotation = Quaternion.Euler(0f, direction.x * 30f, 0f);
+        }
+
+        float myDirection = direction.x;
+        if (currentSpeed < 0 && gasAmount < 0.2f)
+            myDirection = -myDirection;
+
+        float myDirectionMultiplier = 1.2f;
+        
         if (currentSpeed != 0)
-            transform.Rotate(Vector3.up * direction.x * rotationSpeed * Time.deltaTime);
-        if(onRoad)
-            myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
-        else myRigidbody.velocity = transform.forward * (currentSpeed * notOnRoadDiff) * Time.deltaTime;
+        {
+            if(realDrive)
+                transform.Rotate(Vector3.up * myDirection / myDirectionMultiplier * rotationSpeed * Time.deltaTime);
+            else transform.Rotate(Vector3.up * myDirection * rotationSpeed * Time.deltaTime);
+        }
+
+        if (realDrive)
+        {
+            if (onRoad)
+                myRigidbody.velocity = frontLeft.transform.forward * currentSpeed * Time.deltaTime;
+            else myRigidbody.velocity = frontLeft.transform.forward * (currentSpeed * notOnRoadDiff) * Time.deltaTime;
+        }
+        else
+        {
+            if (onRoad)
+                myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
+            else myRigidbody.velocity = transform.forward * (currentSpeed * notOnRoadDiff) * Time.deltaTime;
+        }
+            
+     
     }
 
     void Start()
@@ -192,7 +225,9 @@ public class PlayerCar : MonoBehaviour
         InvokeRepeating("Timer", 0f, tick);
         InvokeRepeating("CheckFlying", 0.5f, 0.5f);
 
-        myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);
+        if(fps)
+            myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);//FIRST PERSON
+        else myCamera.transform.position = new Vector3(transform.position.x - 3f, transform.position.y + 2.95f, transform.position.z - 3f);//THIRD PERSON
         InvokeRepeating("CheckPedals", 0.1f, 0.1f);
 
         if (!Application.isEditor)
