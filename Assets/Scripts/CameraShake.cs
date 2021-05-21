@@ -7,6 +7,7 @@ public class CameraShake : MonoBehaviour
 	float shakeDuration;
 	float shakeAmount = 0.5f;
 	float decreaseFactor = 1.0f;
+	public bool isShaking = false;
 
 	Quaternion originalRot;
 
@@ -17,6 +18,7 @@ public class CameraShake : MonoBehaviour
 
 	public void Shake(float shakeAmount, float shakeDuration)
     {
+		isShaking = true;
 		originalRot = this.transform.localRotation;
 		this.shakeAmount = shakeAmount;
 		this.shakeDuration = shakeDuration;
@@ -29,8 +31,12 @@ public class CameraShake : MonoBehaviour
 			this.transform.localRotation = Quaternion.Euler(originalRot.eulerAngles.x + Random.Range(-1f, 1f) * shakeAmount, originalRot.eulerAngles.y + Random.Range(-1f, 1f) * shakeAmount, originalRot.eulerAngles.z + Random.Range(-1f, 1f) * shakeAmount);
 			shakeDuration -= Time.deltaTime * decreaseFactor;
 		}
-		else
+        else
+        {
 			shakeDuration = 0f;
+			isShaking = false;
+		}
+			
 
 	}
 }

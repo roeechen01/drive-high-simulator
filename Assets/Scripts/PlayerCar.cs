@@ -1,8 +1,7 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System;
 
 public class PlayerCar : MonoBehaviour
 {
@@ -186,7 +185,7 @@ public class PlayerCar : MonoBehaviour
         }
 
         float myDirection = direction.x;
-        if (currentSpeed < 0 && gasAmount < 0.2f)
+        if (currentSpeed < 0 && reverseAmount > 0.2f)
             myDirection = -myDirection;
 
         // @TODO: myDirectionMultiplier should be related to the stick pos
@@ -215,8 +214,6 @@ public class PlayerCar : MonoBehaviour
                 myRigidbody.velocity = transform.forward * currentSpeed * Time.deltaTime;
             else myRigidbody.velocity = transform.forward * (currentSpeed * notOnRoadDiff) * Time.deltaTime;
         }
-            
-     
     }
 
     void Start()
@@ -320,53 +317,54 @@ public class PlayerCar : MonoBehaviour
             myCamera.transform.localRotation = cameraDefaultRotation;
     }
 
+    bool cancelNext = false;
     void ReverseCamera()
     {
-        float heightDiff = 0.002f;
-        myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
         r3 = !r3;
-        if (r3)
-            myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y + heightDiff, myCamera.transform.localPosition.z);
-        else myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y - heightDiff, myCamera.transform.localPosition.z);
+
+        if (!cameraShake.isShaking && !cancelNext)
+        {
+            float heightDiff = 0.002f;
+            myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
+            if (r3)
+                myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y + heightDiff, myCamera.transform.localPosition.z);
+            else myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y - heightDiff, myCamera.transform.localPosition.z);
+        }
+        else cancelNext = false;
+
+        if (r3 && cameraShake.isShaking)
+            cancelNext = true;
     }
 
+
     int i = 0;
-    Vector3 oldPos;
-    Vector3 lastPos;
-    Vector3 lastVelocity;
-    Quaternion oldRot;
-    Quaternion lastRot;
+    List<Vector3> velocityList = new List<Vector3>();
+    List<Vector3> posList = new List<Vector3>();
+    List<Quaternion> rotList = new List<Quaternion>();
+    float overTheLine = 0.25f;
+
     void CheckFlying()
     {
-        float overTheLine = 0.25f;
+        
         if (Mathf.Abs(myRigidbody.velocity.y) > overTheLine)
         {
-            if(lastVelocity.y < overTheLine)
+            int lastIndex = velocityList.Count - 1;
+            bool done = false;
+            while (!done)
             {
-                transform.position = lastPosition;
-                myRigidbody.velocity = Vector3.zero;
-                currentSpeed = 0f;
-                transform.rotation = lastRotation;
-                //print(" NOT OVER THE LINE!");
-            }
-            else
-            {
-                //print("OVER THE LINE!");
-                transform.position = oldPos;
-                myRigidbody.velocity = Vector3.zero;
-                currentSpeed = 0f;
-                transform.rotation = oldRot;
-            }
-           
+                if(Mathf.Abs(velocityList[lastIndex].y) < overTheLine)
+                {
+                    myRigidbody.velocity = Vector3.zero;
+                    transform.position = posList[lastIndex - 1];
+                    transform.rotation = rotList[lastIndex - 1];
+                    currentSpeed = 0;
+                    done = true;
+                }
+                lastIndex--;
+            } 
         }
         i++;
-        if (i == 10)
-        {
-            oldPos = lastPos;
-            oldRot = lastRot;
-            i = 0;
-        }
-        else if(i == 5)
+        if(i % 3 == 0)
         {
             UpdatePositions();
         }
@@ -374,9 +372,10 @@ public class PlayerCar : MonoBehaviour
 
     void UpdatePositions()
     {
-        lastPosition = transform.position;
-        lastRotation = transform.rotation;
-        lastVelocity = myRigidbody.velocity;
+        if(Mathf.Abs(myRigidbody.velocity.y) < overTheLine /*/ 2f*/)
+        velocityList.Add(myRigidbody.velocity);
+        posList.Add(transform.position);
+        rotList.Add(transform.rotation);
     }
 
     void Timer()

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class AirBalloon : MonoBehaviour
 {
-    float secondsToChange = 10f;
     float speed = 2f;
     Rigidbody myRigidbody;
 
@@ -17,7 +16,14 @@ public class AirBalloon : MonoBehaviour
 
     void ChangeDirection()
     {
-        myRigidbody.velocity = new Vector3(0f, -myRigidbody.velocity.y, 0f);
+        myRigidbody.velocity = Vector3.zero;
+        Invoke("SetVelocity", 1f);
+    }
+
+    void SetVelocity()
+    {
+        speed = -speed;
+        myRigidbody.velocity = new Vector3(0f, speed, 0f);
     }
 
 }
