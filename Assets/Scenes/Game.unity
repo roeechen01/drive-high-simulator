@@ -24495,7 +24495,7 @@ PrefabInstance:
     - target: {fileID: 1402697957884278765, guid: 8b0a65536adf27b4b95d60fbee82f345,
         type: 3}
       propertyPath: fps
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1402697957884278765, guid: 8b0a65536adf27b4b95d60fbee82f345,
         type: 3}

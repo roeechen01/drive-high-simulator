@@ -189,12 +189,17 @@ public class PlayerCar : MonoBehaviour
         if (currentSpeed < 0 && gasAmount < 0.2f)
             myDirection = -myDirection;
 
-        float myDirectionMultiplier = 1.2f;
+        // @TODO: myDirectionMultiplier should be related to the stick pos
+        float myDirectionMultiplier = 1f;
+        if(Mathf.Abs(direction.x) > 0.1f)
+        {
+            myDirectionMultiplier = 1f + Mathf.Abs(direction.x) / 2f;
+        }
         
         if (currentSpeed != 0)
         {
             if(realDrive)
-                transform.Rotate(Vector3.up * myDirection / myDirectionMultiplier * rotationSpeed * Time.deltaTime);
+                transform.Rotate(Vector3.up * (myDirection / myDirectionMultiplier) * rotationSpeed * Time.deltaTime);
             else transform.Rotate(Vector3.up * myDirection * rotationSpeed * Time.deltaTime);
         }
 
@@ -224,7 +229,6 @@ public class PlayerCar : MonoBehaviour
         ResetCamera();
         InvokeRepeating("Timer", 0f, tick);
         InvokeRepeating("CheckFlying", 0.5f, 0.5f);
-
         if(fps)
             myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);//FIRST PERSON
         else myCamera.transform.position = new Vector3(transform.position.x - 3f, transform.position.y + 2.95f, transform.position.z - 3f);//THIRD PERSON
