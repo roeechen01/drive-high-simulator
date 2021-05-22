@@ -15,6 +15,7 @@ public class PlayerCar : MonoBehaviour
     [SerializeField] AudioClip carCrash;
     [SerializeField] FrontWheel frontLeft, frontRight;
     Rigidbody myRigidbody;
+    public MeshRenderer myRenderer;
     readonly float tick = 0.1f;
     float soundAddition = 2f;
     float speedAddition = 250f;
@@ -71,15 +72,7 @@ public class PlayerCar : MonoBehaviour
 
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
-        myCamera = FindObjectOfType<Camera>();
-        cameraShake = myCamera.GetComponent<CameraShake>();
-        cinematic = myCamera.GetComponent<CinematicMode>();
-        cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
-        ResetCamera();
-        if (fps)
-            myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);//FIRST PERSON
-        else myCamera.transform.position = new Vector3(transform.position.x - 3f, transform.position.y + 2.95f, transform.position.z - 3f);//THIRD PERSON
-        cinematic.SetOriginalTransform(myCamera.transform);
+   
     }
 
     float gasMax;
@@ -201,7 +194,6 @@ public class PlayerCar : MonoBehaviour
         if (currentSpeed < 0 && reverseAmount > 0.2f)
             myDirection = -myDirection;
 
-        // @TODO: myDirectionMultiplier should be related to the stick pos
         float myDirectionMultiplier = 1f;
         if(Mathf.Abs(direction.x) > 0.1f)
         {
@@ -232,6 +224,16 @@ public class PlayerCar : MonoBehaviour
     void Start()
     {
         myRigidbody = GetComponent<Rigidbody>();
+        myCamera = FindObjectOfType<Camera>();
+        myRenderer = GetComponent<MeshRenderer>();
+        cameraShake = myCamera.GetComponent<CameraShake>();
+        cinematic = myCamera.GetComponent<CinematicMode>();
+        cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
+        ResetCamera();
+        if (fps)
+            myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);//FIRST PERSON
+        else myCamera.transform.position = new Vector3(transform.position.x - 3f, transform.position.y + 2.95f, transform.position.z - 3f);//THIRD PERSON
+        cinematic.SetOriginalTransform(myCamera.transform);
         radio = GetComponent<Radio>();
         InvokeRepeating("Timer", 0f, tick);
         InvokeRepeating("CheckFlying", 0.5f, 0.5f);

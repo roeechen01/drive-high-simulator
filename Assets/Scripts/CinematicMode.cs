@@ -9,6 +9,7 @@ public class CinematicMode : MonoBehaviour
     Camera myCamera;
     public static bool active = false;
     [SerializeField] List<Vector3> positions = new List<Vector3>();
+    float timeToChange = 15f;
 
     void Start()
     {
@@ -24,8 +25,16 @@ public class CinematicMode : MonoBehaviour
 
     void Update()
     {
-        if(active)
+        if (active)
+        {
             myCamera.transform.LookAt(car.transform);
+            if (!car.myRenderer.isVisible)
+            {
+                CancelInvoke("ChangePosition");
+                InvokeRepeating("ChangePosition", 0f, timeToChange);
+            }
+        }
+           
     }
 
     public void Toggle()
@@ -38,20 +47,20 @@ public class CinematicMode : MonoBehaviour
     void StartCinematic()
     {
         active = true;
-        InvokeRepeating("ChangePosition", 0f, 10f);
+        InvokeRepeating("ChangePosition", 0f, timeToChange);
     }
 
     void EndCinematic()
     {
         CancelInvoke("ChangePosition");
         active = false;
-        myCamera.transform.position = car.transform.position + positions[0];
+        myCamera.transform.localPosition = positions[0]; //still not working right, camera goes to wrong direction if car is headed wrong!
         car.ResetCamera();
         //myCamera.transform.rotation = originalTrans.rotation;
     }
     
     void ChangePosition()
     {
-        myCamera.transform.position = car.transform.position + positions[Random.Range(1, positions.Count)];
+        myCamera.transform.localPosition = positions[Random.Range(1, positions.Count)];
     }
 }
