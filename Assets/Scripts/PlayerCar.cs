@@ -10,7 +10,7 @@ public class PlayerCar : MonoBehaviour
     CinematicMode cinematic;
     public AudioSource carSounds;
     [SerializeField] AudioClip[] lightCrashSounds;
-    [SerializeField]  AudioClip[] heavyCrashSounds;
+    [SerializeField] AudioClip[] heavyCrashSounds;
     [SerializeField] AudioClip[] breaksSounds;
     [SerializeField] AudioClip carCrash;
     [SerializeField] FrontWheel frontLeft, frontRight;
@@ -64,22 +64,30 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.ReverseCamera.performed += ctx => ReverseCamera();
         controls.Gameplay.ReverseCamera.canceled += ctx => ReverseCamera();
 
-        controls.Gameplay.ToggleCinematicMode.performed += ctx => cinematic.Toggle();
+        controls.Gameplay.ToggleCinematicMode.performed += ctx => ToggleCinematic();
 
         controls.Gameplay.Quit.performed += ctx => Application.Quit();
 
-        
+
 
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
-   
+
     }
 
     float gasMax;
     float brakesForSound = 0.75f;
     bool finishedBrakes = true;
-    void PlayBrakes() {
-        if(reverseAmount >= brakesForSound && !IsInvoking("SetCrash") && finishedBrakes)
+
+    void ToggleCinematic()
+    {
+        if (!r3)
+            cinematic.Toggle();
+    }
+
+    void PlayBrakes()
+    {
+        if (reverseAmount >= brakesForSound && !IsInvoking("SetCrash") && finishedBrakes)
         {
             carSounds.Stop();
             carSounds.clip = breaksSounds[UnityEngine.Random.Range(1, breaksSounds.Length)];
@@ -97,7 +105,7 @@ public class PlayerCar : MonoBehaviour
     {
         gasMax = 18750f / buildDifference;
         float reverseMax = -gasMax / 2, noGasDiv = 15f, minSound = 10f;
-       
+
         if (/*!*/(reverseAmount > 0.2f) || /*!*/(gasAmount > 0.2f) || !(currentSpeed == 0))
         {
             if (reverseAmount < brakesForSound)
@@ -107,7 +115,7 @@ public class PlayerCar : MonoBehaviour
             {
                 if (currentSpeed > 0)
                 {
-                    if(reverseAmount >= brakesForSound && currentSpeed > 0.225f * gasMax && !IsInvoking("BreaksCooldown"))
+                    if (reverseAmount >= brakesForSound && currentSpeed > 0.225f * gasMax && !IsInvoking("BreaksCooldown"))
                     {
                         Invoke("PlayBrakes", 0.25f);
                     }
@@ -157,16 +165,16 @@ public class PlayerCar : MonoBehaviour
         // currentSound = (Mathf.Abs(currentSpeed) / -1 * reverseMax) * 100;
         engine.volume = 0.3f/*0.8f*/ * (currentSound / 100);
 
-       // if (this.myRigidbody.velocity == Vector3.zero)
-           // currentSpeed = 0;
+        // if (this.myRigidbody.velocity == Vector3.zero)
+        // currentSpeed = 0;
 
-        if(currentSpeed >= 0)
+        if (currentSpeed >= 0)
         {
             float maxSpeed = 120;
             float speedInKph = (Mathf.Abs(currentSpeed) / gasMax) * maxSpeed;
-            if(onHardCollision)
+            if (onHardCollision)
                 radio.speedText.text = "KPH: " + 0;
-            else if(onRoad)
+            else if (onRoad)
                 radio.speedText.text = "KPH: " + Math.Round(speedInKph).ToString();
             else radio.speedText.text = "KPH: " + Math.Round((notOnRoadDiff * speedInKph)).ToString();
         }
@@ -182,8 +190,8 @@ public class PlayerCar : MonoBehaviour
 
     private void ChangeSpeed()
     {
-        FrontWheel[] frontWheels = {frontLeft, frontRight };
-        foreach(FrontWheel frontWheel in frontWheels)
+        FrontWheel[] frontWheels = { frontLeft, frontRight };
+        foreach (FrontWheel frontWheel in frontWheels)
         {
             if (realDrive && Mathf.Abs(direction.x) < 0.1f)
                 frontWheel.transform.localRotation = Quaternion.identity;
@@ -195,14 +203,14 @@ public class PlayerCar : MonoBehaviour
             myDirection = -myDirection;
 
         float myDirectionMultiplier = 1f;
-        if(Mathf.Abs(direction.x) > 0.1f)
+        if (Mathf.Abs(direction.x) > 0.1f)
         {
             myDirectionMultiplier = 1f + Mathf.Abs(direction.x) / 2f;
         }
-        
+
         if (currentSpeed != 0)
         {
-            if(realDrive)
+            if (realDrive)
                 transform.Rotate(Vector3.up * (myDirection / myDirectionMultiplier) * rotationSpeed * Time.deltaTime);
             else transform.Rotate(Vector3.up * myDirection * rotationSpeed * Time.deltaTime);
         }
@@ -308,7 +316,7 @@ public class PlayerCar : MonoBehaviour
             }
             myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y, 0f);
         }
-          
+
     }
 
     private void OnEnable()
@@ -323,16 +331,16 @@ public class PlayerCar : MonoBehaviour
 
     public void ResetCamera()
     {
-        if(!r3)
+        if (!r3)
             myCamera.transform.localRotation = cameraDefaultRotation;
     }
 
-    bool cancelNext = false;
+    bool crashCancel = false;
     void ReverseCamera()
     {
         r3 = !r3;
 
-        if (!cameraShake.isShaking && !cancelNext)
+        if (!cameraShake.isShaking && !crashCancel && !CinematicMode.active)
         {
             float heightDiff = 0.002f;
             myCamera.transform.Rotate(new Vector3(0, 1, 0), 180f);
@@ -340,10 +348,10 @@ public class PlayerCar : MonoBehaviour
                 myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y + heightDiff, myCamera.transform.localPosition.z);
             else myCamera.transform.localPosition = new Vector3(myCamera.transform.localPosition.x, myCamera.transform.localPosition.y - heightDiff, myCamera.transform.localPosition.z);
         }
-        else cancelNext = false;
+        else crashCancel = false;
 
         if (r3 && cameraShake.isShaking)
-            cancelNext = true;
+            crashCancel = true;
     }
 
 
@@ -355,14 +363,14 @@ public class PlayerCar : MonoBehaviour
 
     void CheckFlying()
     {
-        
+
         if (Mathf.Abs(myRigidbody.velocity.y) > overTheLine)
         {
             int lastIndex = velocityList.Count - 1;
             bool done = false;
             while (!done)
             {
-                if(Mathf.Abs(velocityList[lastIndex].y) < overTheLine)
+                if (Mathf.Abs(velocityList[lastIndex].y) < overTheLine)
                 {
                     myRigidbody.velocity = Vector3.zero;
                     transform.position = posList[lastIndex - 1];
@@ -371,10 +379,10 @@ public class PlayerCar : MonoBehaviour
                     done = true;
                 }
                 lastIndex--;
-            } 
+            }
         }
         i++;
-        if(i % 3 == 0)
+        if (i % 3 == 0)
         {
             UpdatePositions();
         }
@@ -382,8 +390,8 @@ public class PlayerCar : MonoBehaviour
 
     void UpdatePositions()
     {
-        if(Mathf.Abs(myRigidbody.velocity.y) < overTheLine /*/ 2f*/)
-        velocityList.Add(myRigidbody.velocity);
+        if (Mathf.Abs(myRigidbody.velocity.y) < overTheLine /*/ 2f*/)
+            velocityList.Add(myRigidbody.velocity);
         posList.Add(transform.position);
         rotList.Add(transform.rotation);
     }
@@ -424,8 +432,9 @@ public class PlayerCar : MonoBehaviour
                             if (!IsInvoking("SetCrash"))
                                 carSounds.clip = lightCrashSounds[UnityEngine.Random.Range(0, lightCrashSounds.Length)];
                         }
-                            
-                        else {
+
+                        else
+                        {
                             cameraShake.Shake((currentSpeed / gasMax), 0.2f);
                             if (!IsInvoking("SetCrash"))
                                 carSounds.clip = heavyCrashSounds[UnityEngine.Random.Range(0, heavyCrashSounds.Length)];
@@ -440,17 +449,18 @@ public class PlayerCar : MonoBehaviour
                     cameraShake.Shake((currentSpeed / gasMax) * mass, 0.15f);
                 }
 
-                if (!IsInvoking("SetCrash")) {
+                if (!IsInvoking("SetCrash"))
+                {
 
                     soundMultiplier *= Mathf.Abs(currentSpeed) / 15000f;
                     carSounds.volume = soundMultiplier;
-                    carSounds.Play(); 
+                    carSounds.Play();
                 }
 
                 multiplier = this.myRigidbody.mass - collisionObject.GetComponent<Rigidbody>().mass;
                 currentSpeed *= multiplier;
             }
-        }  
+        }
     }
 
     private void OnCollisionStay(Collision collision)
@@ -481,13 +491,13 @@ public class PlayerCar : MonoBehaviour
         if (collisionObject.CompareTag("Flower"))
         {
             Flower flower = collisionObject.GetComponent<Flower>();
-            if(flower.squishCounter > 0)
+            if (flower.squishCounter > 0)
             {
                 collisionObject.transform.localScale = new Vector3(collisionObject.transform.localScale.x * 2f, collisionObject.transform.localScale.y / 5, collisionObject.transform.localScale.z * 2f);
                 flower.squishCounter--;
                 flower.PlaySquish();
             }
         }
-             
+
     }
 }

@@ -10,7 +10,6 @@ public class CinematicMode : MonoBehaviour
     Camera myCamera;
     [SerializeField] List<Vector3> positions = new List<Vector3>();
     float timeToChange = 30f;
-    float littleNum = /*1.75f*/ 0.1f;
     public static bool active = false;
 
     void Start()
@@ -19,19 +18,23 @@ public class CinematicMode : MonoBehaviour
         myCamera = GetComponentInChildren<Camera>();
     }
 
+    bool NonCarHit(RaycastHit[] hits)
+    {
+        foreach (RaycastHit hit in hits)
+        {
+            if (!hit.transform.GetComponent<PlayerCar>())
+                return true;
+        }
+        return false;
+    }
+
     void Update()
     {
         if (active)
-        {
             myCamera.transform.LookAt(car.transform);
-        }
 
-        float maxDistance = Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)) - littleNum;
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward, maxDistance);
-        if (!IsInvoking("Check") && hits.Length > 0/*Physics.Raycast(transform.position, transform.forward, out hit, maxDistance)*/)
-        {
+        if (!IsInvoking("Check") && NonCarHit(Physics.RaycastAll(transform.position, transform.forward, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
             StartCheck();
-        }
     }
 
     float counter = 1;
@@ -50,9 +53,7 @@ public class CinematicMode : MonoBehaviour
     void Check()
     {
         counter -= 0.1f;
-        float maxDistance = Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)) - littleNum;
-        RaycastHit[] hits = Physics.RaycastAll(transform.position, transform.forward, maxDistance);
-        if (/*Physics.Raycast(transform.position, transform.forward, out hit, maxDistance)*/hits.Length > 1)
+        if (NonCarHit(Physics.RaycastAll(transform.position, transform.forward, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
         {
             if (counter <= 0)
             {
@@ -95,5 +96,7 @@ public class CinematicMode : MonoBehaviour
     void ChangePosition()
     {
         myCamera.transform.localPosition = positions[Random.Range(1, positions.Count)];
+        if (NonCarHit(Physics.RaycastAll(transform.position, transform.forward, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
+            ChangePosition();
     }
 }
