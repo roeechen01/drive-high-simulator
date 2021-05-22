@@ -319,6 +319,11 @@ public class PlayerCar : MonoBehaviour
 
     }
 
+   public Vector2 GetView()
+    {
+        return view;
+    }
+
     private void OnEnable()
     {
         controls.Gameplay.Enable();
@@ -331,7 +336,7 @@ public class PlayerCar : MonoBehaviour
 
     public void ResetCamera()
     {
-        if (!r3)
+        if (!r3 && !CinematicMode.active)
             myCamera.transform.localRotation = cameraDefaultRotation;
     }
 

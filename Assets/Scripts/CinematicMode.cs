@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CinematicMode : MonoBehaviour
 {
+    PlayerControls controls;
     RaycastHit hit;
     Transform originalTrans;
     PlayerCar car;
@@ -12,10 +13,26 @@ public class CinematicMode : MonoBehaviour
     float timeToChange = 30f;
     public static bool active = false;
 
+    private void Awake()
+    {
+        controls = new PlayerControls();
+        controls.Gameplay.ResetCamera.performed += ctx => ResetCamera();
+    }
+
     void Start()
     {
         car = FindObjectOfType<PlayerCar>();
         myCamera = GetComponentInChildren<Camera>();
+    }
+
+    void ResetCamera()
+    {
+        if (CinematicMode.active)
+        {
+            myCamera.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            myCamera.transform.LookAt(car.transform);
+        }
+           
     }
 
     bool NonCarHit(RaycastHit[] hits)
@@ -30,15 +47,15 @@ public class CinematicMode : MonoBehaviour
 
     void Update()
     {
-        if (active)
-            myCamera.transform.LookAt(car.transform);
+        //if (active)
+            //myCamera.transform.LookAt(car.transform);
 
-        if (!IsInvoking("Check") && NonCarHit(Physics.RaycastAll(transform.position, transform.forward, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
+        if (!IsInvoking("Check") && NonCarHit(Physics.RaycastAll(transform.position, car.transform.position - myCamera.transform.position, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
             StartCheck();
+        ChangeCameraDirection();
     }
 
     float counter = 1;
-    int timesCounter = 0;
     void StartCheck()
     {
         counter = 1f;
@@ -53,7 +70,7 @@ public class CinematicMode : MonoBehaviour
     void Check()
     {
         counter -= 0.1f;
-        if (NonCarHit(Physics.RaycastAll(transform.position, transform.forward, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
+        if (NonCarHit(Physics.RaycastAll(transform.position, car.transform.position - myCamera.transform.position, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
         {
             if (counter <= 0)
             {
@@ -61,7 +78,6 @@ public class CinematicMode : MonoBehaviour
                 CancelInvoke("ChangePosition");
                 StartCinematic();
                 counter = 1f;
-                print("restarting!" + ++timesCounter);
             }
         }
         else
@@ -88,7 +104,7 @@ public class CinematicMode : MonoBehaviour
     {
         CancelInvoke("ChangePosition");
         active = false;
-        myCamera.transform.localPosition = positions[0]; //still not working right, camera goes to wrong direction if car is headed wrong!
+        myCamera.transform.localPosition = positions[0];
         car.ResetCamera();
         //myCamera.transform.rotation = originalTrans.rotation;
     }
@@ -96,7 +112,32 @@ public class CinematicMode : MonoBehaviour
     void ChangePosition()
     {
         myCamera.transform.localPosition = positions[Random.Range(1, positions.Count)];
+        myCamera.transform.LookAt(car.transform);
         if (NonCarHit(Physics.RaycastAll(transform.position, transform.forward, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
             ChangePosition();
     }
+
+    void ChangeCameraDirection()
+    {
+        if (CinematicMode.active)
+        {
+            Vector2 view = car.GetView();
+            float rotationSpeed = 50f;
+            myCamera.transform.Rotate(-view.y * Time.deltaTime * rotationSpeed, view.x * Time.deltaTime * rotationSpeed, 0f);
+            myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y, 0f);
+            //myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y, 0f);
+        }
+
+    }
+    private void OnEnable()
+    {
+        controls.Gameplay.Enable();
+    }
+
+    private void OnDisable()
+    {
+        controls.Gameplay.Disable();
+    }
+
 }
+
