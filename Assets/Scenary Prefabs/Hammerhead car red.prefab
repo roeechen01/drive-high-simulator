@@ -806,6 +806,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e38c7ec394b30e949868e2cac15ef3d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isShaking: 0
 --- !u!1 &1402697957785219293
 GameObject:
   m_ObjectHideFlags: 0
@@ -1392,10 +1393,12 @@ MonoBehaviour:
   - {fileID: 8300000, guid: cfc2ead316414d9459f38069c9b52609, type: 3}
   - {fileID: 8300000, guid: 5432490032e77954c870b2965043e368, type: 3}
   carCrash: {fileID: 8300000, guid: db099e894532bd947a4471ffaa5c74cf, type: 3}
-  leftFront: {fileID: 0}
-  rightFront: {fileID: 0}
+  frontLeft: {fileID: 0}
+  frontRight: {fileID: 0}
   buildDifference: 5.5
   engine: {fileID: 1402697957884278760}
+  fps: 1
+  realDrive: 0
 --- !u!114 &1402697957884278761
 MonoBehaviour:
   m_ObjectHideFlags: 0

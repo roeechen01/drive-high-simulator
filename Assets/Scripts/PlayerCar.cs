@@ -7,6 +7,7 @@ public class PlayerCar : MonoBehaviour
 {
     Camera myCamera;
     CameraShake cameraShake;
+    CinematicMode cinematic;
     public AudioSource carSounds;
     [SerializeField] AudioClip[] lightCrashSounds;
     [SerializeField]  AudioClip[] heavyCrashSounds;
@@ -62,11 +63,23 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.ReverseCamera.performed += ctx => ReverseCamera();
         controls.Gameplay.ReverseCamera.canceled += ctx => ReverseCamera();
 
+        controls.Gameplay.ToggleCinematicMode.performed += ctx => cinematic.Toggle();
+
         controls.Gameplay.Quit.performed += ctx => Application.Quit();
 
         
 
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        myCamera = FindObjectOfType<Camera>();
+        cameraShake = myCamera.GetComponent<CameraShake>();
+        cinematic = myCamera.GetComponent<CinematicMode>();
+        cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
+        ResetCamera();
+        if (fps)
+            myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);//FIRST PERSON
+        else myCamera.transform.position = new Vector3(transform.position.x - 3f, transform.position.y + 2.95f, transform.position.z - 3f);//THIRD PERSON
+        cinematic.SetOriginalTransform(myCamera.transform);
     }
 
     float gasMax;
@@ -76,7 +89,7 @@ public class PlayerCar : MonoBehaviour
         if(reverseAmount >= brakesForSound && !IsInvoking("SetCrash") && finishedBrakes)
         {
             carSounds.Stop();
-            carSounds.clip = breaksSounds[UnityEngine.Random.Range(0, breaksSounds.Length)];
+            carSounds.clip = breaksSounds[UnityEngine.Random.Range(1, breaksSounds.Length)];
             if (reverseAmount * (currentSpeed / gasMax) > 1)
                 carSounds.volume = 1;
             else
@@ -219,16 +232,9 @@ public class PlayerCar : MonoBehaviour
     void Start()
     {
         myRigidbody = GetComponent<Rigidbody>();
-        myCamera = FindObjectOfType<Camera>();
-        cameraShake = myCamera.GetComponent<CameraShake>();
         radio = GetComponent<Radio>();
-        cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
-        ResetCamera();
         InvokeRepeating("Timer", 0f, tick);
         InvokeRepeating("CheckFlying", 0.5f, 0.5f);
-        if(fps)
-            myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);//FIRST PERSON
-        else myCamera.transform.position = new Vector3(transform.position.x - 3f, transform.position.y + 2.95f, transform.position.z - 3f);//THIRD PERSON
         InvokeRepeating("CheckPedals", 0.1f, 0.1f);
 
         if (!Application.isEditor)
@@ -239,7 +245,7 @@ public class PlayerCar : MonoBehaviour
     void ChangeCameraDirection()
     {
         float stickError = 0.1f, back = 0.075f;
-        if (view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError)
+        if (!CinematicMode.active && (view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError))
         {
             if (!r3)
             {
@@ -311,7 +317,7 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.Disable();
     }
 
-    void ResetCamera()
+    public void ResetCamera()
     {
         if(!r3)
             myCamera.transform.localRotation = cameraDefaultRotation;

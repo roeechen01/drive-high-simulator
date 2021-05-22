@@ -121,6 +121,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""ToggleCinematicMode"",
+                    ""type"": ""Button"",
+                    ""id"": ""10003404-2abc-43e7-940f-895649f1ddea"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -266,6 +274,17 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""action"": ""ToggleHUD"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9265aacb-67b7-4ada-a76c-d179179b2429"",
+                    ""path"": ""<DualShockGamepad>/touchpadButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleCinematicMode"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -287,6 +306,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         m_Gameplay_VolDown = m_Gameplay.FindAction("VolDown", throwIfNotFound: true);
         m_Gameplay_Restart = m_Gameplay.FindAction("Restart", throwIfNotFound: true);
         m_Gameplay_ToggleHUD = m_Gameplay.FindAction("ToggleHUD", throwIfNotFound: true);
+        m_Gameplay_ToggleCinematicMode = m_Gameplay.FindAction("ToggleCinematicMode", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -349,6 +369,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_VolDown;
     private readonly InputAction m_Gameplay_Restart;
     private readonly InputAction m_Gameplay_ToggleHUD;
+    private readonly InputAction m_Gameplay_ToggleCinematicMode;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -366,6 +387,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         public InputAction @VolDown => m_Wrapper.m_Gameplay_VolDown;
         public InputAction @Restart => m_Wrapper.m_Gameplay_Restart;
         public InputAction @ToggleHUD => m_Wrapper.m_Gameplay_ToggleHUD;
+        public InputAction @ToggleCinematicMode => m_Wrapper.m_Gameplay_ToggleCinematicMode;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -414,6 +436,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @ToggleHUD.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleHUD;
                 @ToggleHUD.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleHUD;
                 @ToggleHUD.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleHUD;
+                @ToggleCinematicMode.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleCinematicMode;
+                @ToggleCinematicMode.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleCinematicMode;
+                @ToggleCinematicMode.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleCinematicMode;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -457,6 +482,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @ToggleHUD.started += instance.OnToggleHUD;
                 @ToggleHUD.performed += instance.OnToggleHUD;
                 @ToggleHUD.canceled += instance.OnToggleHUD;
+                @ToggleCinematicMode.started += instance.OnToggleCinematicMode;
+                @ToggleCinematicMode.performed += instance.OnToggleCinematicMode;
+                @ToggleCinematicMode.canceled += instance.OnToggleCinematicMode;
             }
         }
     }
@@ -476,5 +504,6 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         void OnVolDown(InputAction.CallbackContext context);
         void OnRestart(InputAction.CallbackContext context);
         void OnToggleHUD(InputAction.CallbackContext context);
+        void OnToggleCinematicMode(InputAction.CallbackContext context);
     }
 }

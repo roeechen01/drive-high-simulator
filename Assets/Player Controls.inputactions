@@ -108,6 +108,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "ToggleCinematicMode",
+                    "type": "Button",
+                    "id": "10003404-2abc-43e7-940f-895649f1ddea",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -251,6 +259,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleHUD",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9265aacb-67b7-4ada-a76c-d179179b2429",
+                    "path": "<DualShockGamepad>/touchpadButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleCinematicMode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
