@@ -14,6 +14,7 @@ public class PlayerCar : MonoBehaviour
     [SerializeField] AudioClip[] breaksSounds;
     [SerializeField] AudioClip carCrash;
     [SerializeField] FrontWheel frontLeft, frontRight;
+    Weed weed;
     Radio radio;
     public AudioSource engine;
     Rigidbody myRigidbody;
@@ -45,6 +46,7 @@ public class PlayerCar : MonoBehaviour
 
     private void Awake()
     {
+        weed = FindObjectOfType<Weed>();
         controls = new PlayerControls();
 
         controls.Gameplay.Gas.performed += ctx => gasAmount = ctx.ReadValue<float>();
@@ -67,6 +69,8 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.Quit.performed += ctx => Application.Quit();
 
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        controls.Gameplay.ToggleJoint.performed += ctx => weed.ToggleJoint();
     }
 
     float gasMax;
@@ -249,7 +253,7 @@ public class PlayerCar : MonoBehaviour
     void ChangeCameraDirection()
     {
         float stickError = 0.1f, back = 0.075f;
-        if (!CinematicMode.active && (view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError))
+        if (!weed.IsInvoking("StopJoint") && !CinematicMode.active && (view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError))
         {
             if (!r3)
             {

@@ -116,6 +116,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "ToggleJoint",
+                    "type": "Button",
+                    "id": "eb0ef7bb-f0ff-47f5-9332-713c01f62ebf",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
                 }
             ],
             "bindings": [
@@ -270,6 +278,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleCinematicMode",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8b62e8a5-5955-42c3-9e73-bf1992d9a523",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ToggleJoint",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
