@@ -19,8 +19,8 @@ public class PlayerCar : MonoBehaviour
     Rigidbody myRigidbody;
     public MeshRenderer myRenderer;
     readonly float tick = 0.1f;
-    float soundAddition = 13f;//8
-    float speedAddition = 1700;//8
+    float soundAddition = 2f;
+    float speedAddition = 250f;
     float currentSound = 0f;
     float currentSpeed = 0f;
     float rotationSpeed = 125f;
@@ -113,27 +113,27 @@ public class PlayerCar : MonoBehaviour
                     {
                         Invoke("PlayBrakes", 0.25f);
                     }
-                    currentSpeed -= speedAddition * reverseAmount * 2 * Time.deltaTime;
-                    currentSound -= soundAddition * 2 * Time.deltaTime;
+                    currentSpeed -= speedAddition * reverseAmount * 2;
+                    currentSound -= soundAddition * 2;
                 }
 
                 else
                 {
-                    currentSpeed -= speedAddition * reverseAmount * Time.deltaTime;
-                    currentSound += soundAddition * Time.deltaTime;
+                    currentSpeed -= speedAddition * reverseAmount;
+                    currentSound += soundAddition;
                 }
             }
             else if (gasAmount > 0.2f && currentSpeed < gasMax)
             {
-                currentSpeed += speedAddition * gasAmount * Time.deltaTime;
-                currentSound += soundAddition * Time.deltaTime / 2;
+                currentSpeed += speedAddition * gasAmount;
+                currentSound += soundAddition / 2;
             }
 
             else if (currentSpeed > 0)
             {
-                currentSpeed -= speedAddition * Time.deltaTime / 5f;
-                currentSound -= soundAddition * Time.deltaTime / noGasDiv;
-                if (currentSpeed <= speedAddition / 16f) currentSpeed = 0;
+                currentSpeed -= speedAddition / 5;
+                currentSound -= soundAddition / noGasDiv;
+                if (currentSpeed <= speedAddition) currentSpeed = 0;
                 if (currentSound <= 0) currentSound = 0;
             }
 
@@ -141,8 +141,8 @@ public class PlayerCar : MonoBehaviour
             {
                 if (currentSpeed < 0)
                 {
-                    currentSpeed += speedAddition * Time.deltaTime / 5;
-                    currentSound -= soundAddition * Time.deltaTime / noGasDiv;
+                    currentSpeed += speedAddition / 5;
+                    currentSound -= soundAddition / noGasDiv;
                     if (currentSpeed >= speedAddition) currentSpeed = 0;
                     if (currentSound <= 0) currentSound = 0;
                 }
@@ -180,7 +180,6 @@ public class PlayerCar : MonoBehaviour
     {
         ChangeSpeed();
         ChangeCameraDirection();
-        CheckPedals();
     }
 
     private void ChangeSpeed()
@@ -198,10 +197,8 @@ public class PlayerCar : MonoBehaviour
             myDirection = -myDirection;
 
         float myDirectionMultiplier = 1f;
-        if (Mathf.Abs(direction.x) > 0.1f)
-        {
-            myDirectionMultiplier = 1f + Mathf.Abs(direction.x) / 5f;
-        }
+        if (Mathf.Abs(direction.x) > 0.2f)
+            myDirectionMultiplier = 1f + Mathf.Abs(direction.x) / 2f;
 
         if (currentSpeed != 0)
         {
@@ -240,12 +237,11 @@ public class PlayerCar : MonoBehaviour
         radio = GetComponent<Radio>();
         InvokeRepeating("Timer", 0f, tick);
         InvokeRepeating("CheckFlying", 0.5f, 0.5f);
-        //InvokeRepeating("CheckPedals", 0.1f, 0.1f);
+        InvokeRepeating("CheckPedals", 0.1f, 0.1f);
 
         if (!Application.isEditor)
             speedAddition /= buildDifference;
         else buildDifference = 1;
-
     }
 
 
@@ -315,7 +311,7 @@ public class PlayerCar : MonoBehaviour
 
     }
 
-   public Vector2 GetView()
+    public Vector2 GetView()
     {
         return view;
     }
