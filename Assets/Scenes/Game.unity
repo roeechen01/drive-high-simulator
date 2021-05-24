@@ -25963,6 +25963,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   joint: {fileID: 1201370666485479825}
   clipper: {fileID: 7027169251750662129}
+  fire: {fileID: 4670899682455049479}
+  clipperLight: {fileID: 9115977715545232846}
   NSFW: 0
 --- !u!33 &1421733159293409904
 MeshFilter:
@@ -45191,7 +45193,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7047927058709501061
 Transform:
   m_ObjectHideFlags: 0
@@ -45585,7 +45587,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7027169251750662129}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
-  m_LocalPosition: {x: -0.0025750026, y: 0.005049, z: -0.0005985805}
+  m_LocalPosition: {x: -0.00053, y: 0.00279, z: 0.00109}
   m_LocalScale: {x: 0.0071428595, y: 0.0071428553, z: 0.00625}
   m_Children:
   - {fileID: 808571118812864750}
@@ -47062,8 +47064,8 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 0.84705883, g: 0.5019608, b: 0, a: 1}
-  m_Intensity: 1.5
-  m_Range: 5
+  m_Intensity: 1
+  m_Range: 3
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -47104,7 +47106,7 @@ Light:
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 1
+  m_BounceIntensity: 0
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
