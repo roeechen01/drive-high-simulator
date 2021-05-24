@@ -137,6 +137,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""LightClipper"",
+                    ""type"": ""Button"",
+                    ""id"": ""efead080-3383-4731-aca6-24c05fb77386"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(pressPoint=0.1)""
                 }
             ],
             ""bindings"": [
@@ -304,6 +312,17 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""action"": ""ToggleJoint"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""901eae8d-96c0-4874-a44b-b45e5451e61e"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""LightClipper"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -327,6 +346,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         m_Gameplay_ToggleHUD = m_Gameplay.FindAction("ToggleHUD", throwIfNotFound: true);
         m_Gameplay_ToggleCinematicMode = m_Gameplay.FindAction("ToggleCinematicMode", throwIfNotFound: true);
         m_Gameplay_ToggleJoint = m_Gameplay.FindAction("ToggleJoint", throwIfNotFound: true);
+        m_Gameplay_LightClipper = m_Gameplay.FindAction("LightClipper", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -391,6 +411,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_ToggleHUD;
     private readonly InputAction m_Gameplay_ToggleCinematicMode;
     private readonly InputAction m_Gameplay_ToggleJoint;
+    private readonly InputAction m_Gameplay_LightClipper;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -410,6 +431,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         public InputAction @ToggleHUD => m_Wrapper.m_Gameplay_ToggleHUD;
         public InputAction @ToggleCinematicMode => m_Wrapper.m_Gameplay_ToggleCinematicMode;
         public InputAction @ToggleJoint => m_Wrapper.m_Gameplay_ToggleJoint;
+        public InputAction @LightClipper => m_Wrapper.m_Gameplay_LightClipper;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -464,6 +486,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @ToggleJoint.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleJoint;
                 @ToggleJoint.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleJoint;
                 @ToggleJoint.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnToggleJoint;
+                @LightClipper.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLightClipper;
+                @LightClipper.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLightClipper;
+                @LightClipper.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLightClipper;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -513,6 +538,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @ToggleJoint.started += instance.OnToggleJoint;
                 @ToggleJoint.performed += instance.OnToggleJoint;
                 @ToggleJoint.canceled += instance.OnToggleJoint;
+                @LightClipper.started += instance.OnLightClipper;
+                @LightClipper.performed += instance.OnLightClipper;
+                @LightClipper.canceled += instance.OnLightClipper;
             }
         }
     }
@@ -534,5 +562,6 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         void OnToggleHUD(InputAction.CallbackContext context);
         void OnToggleCinematicMode(InputAction.CallbackContext context);
         void OnToggleJoint(InputAction.CallbackContext context);
+        void OnLightClipper(InputAction.CallbackContext context);
     }
 }

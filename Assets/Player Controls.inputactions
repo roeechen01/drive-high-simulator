@@ -124,6 +124,14 @@
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
+                },
+                {
+                    "name": "LightClipper",
+                    "type": "Button",
+                    "id": "efead080-3383-4731-aca6-24c05fb77386",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(pressPoint=0.1)"
                 }
             ],
             "bindings": [
@@ -289,6 +297,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "ToggleJoint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "901eae8d-96c0-4874-a44b-b45e5451e61e",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LightClipper",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -71,6 +71,9 @@ public class PlayerCar : MonoBehaviour
         controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 
         controls.Gameplay.ToggleJoint.performed += ctx => weed.ToggleJoint();
+
+        controls.Gameplay.LightClipper.performed += ctx => weed.LightClipper();
+        controls.Gameplay.LightClipper.canceled += ctx => weed.StopLightClipper();
     }
 
     float gasMax;
