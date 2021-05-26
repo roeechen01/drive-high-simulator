@@ -11,7 +11,7 @@ public class Weed : MonoBehaviour
 
     float jointSpeed = 0.00000002728f;
     bool jointOnScreen = false, clipperOnScreen = false;
-    bool jointUsed = false, clipperUsed = false;
+    bool jointUsed = false, clipperUsed = false, hitting = false;
     [SerializeField] ParticleSystem lit;
     [SerializeField] Light litLight;
 
@@ -25,6 +25,7 @@ public class Weed : MonoBehaviour
     [SerializeField] Light clipperLight;
     [SerializeField] Light sparksLight;
     [SerializeField] GameObject clipperButton;
+    Vector3 buttonStartPos;
     [SerializeField] GameObject clipperWheel;
 
 
@@ -48,6 +49,7 @@ public class Weed : MonoBehaviour
         fireScale = fire.transform.localScale;
         fire.transform.localScale = Vector3.zero;
         clipperSpeed = -(clipperFinalPos - clipper.transform.localPosition) / 200f;
+        buttonStartPos = clipperButton.transform.localPosition;
     }
 
     void Update()
@@ -59,7 +61,10 @@ public class Weed : MonoBehaviour
 
         if (jointLit)
         {
-            lit.transform.localScale = new Vector3(0.008f, 0.01f, 0.008f);
+            if (hitting) 
+                lit.transform.localScale = new Vector3(0.01f, 0.012f, 0.01f);
+            else lit.transform.localScale = new Vector3(0.007f, 0.009f, 0.007f);
+
             litLight.enabled = true;
         }
         else
@@ -67,6 +72,30 @@ public class Weed : MonoBehaviour
             lit.transform.localScale = Vector3.zero;
             litLight.enabled = false;
         }
+
+        if (IsInvoking("StopJointAndClipper") || IsInvoking("StopJoint"))
+            jointLit = false;
+
+        if (hitting && jointLit)
+        {
+            CancelInvoke("StopLit");
+            Invoke("StopLit", 10f);
+        }
+    }
+
+    public void Hit()
+    {
+        hitting = true;
+    }
+
+    public void StopHit()
+    {
+        hitting = false;
+    }
+
+    void StopLit()
+    {
+        jointLit = false;
     }
 
 
@@ -76,7 +105,7 @@ public class Weed : MonoBehaviour
     void IncreaseLitTime()
     {
         timeLit += 0.1f;
-        if (timeLit >= 1.5f && !jointLit)
+        if (timeLit >= 1.5f && !jointLit && hitting)
         {
             jointLit = true;
             clipperSpeed = -clipperSpeed;
@@ -110,8 +139,9 @@ public class Weed : MonoBehaviour
     bool valid = false, lastWorked = false;
     public void LightClipper()
     {
-        if(!clipperUsed && jointUsed && NoMoveAnimation())
+        if(!clipperUsed && jointUsed && NoMoveAnimation() && !jointLit)
         {
+            car.ResetCamera();
             clipperSpeed = -clipperSpeed;
             InvokeRepeating("MoveClipperAnimation", 0f, 0.01f);
             Invoke("StopClipper", 2f);
@@ -149,18 +179,9 @@ public class Weed : MonoBehaviour
         //{
         if (IsInvoking("IncreaseLitTime") || valid)
         {
-            //if (!IsInvoking("PushButton"))
-            //{
                 if (lastWorked)
-                {
                     CancelInvoke("IncreaseLitTime");
-                    clipperButton.transform.localPosition = new Vector3(clipperButton.transform.localPosition.x, clipperButton.transform.localPosition.y, clipperButton.transform.localPosition.z + 0.002f);
-                }
-                else
-                {
-                    clipperButton.transform.localPosition = new Vector3(clipperButton.transform.localPosition.x, clipperButton.transform.localPosition.y, clipperButton.transform.localPosition.z + 0.0015f);
-                }
-            //}
+            clipperButton.transform.localPosition = buttonStartPos;
             
 
         }

@@ -74,6 +74,9 @@ public class PlayerCar : MonoBehaviour
 
         controls.Gameplay.LightClipper.performed += ctx => weed.LightClipper();
         controls.Gameplay.LightClipper.canceled += ctx => weed.StopLightClipper();
+
+        controls.Gameplay.Hit.performed += ctx => weed.Hit();
+        controls.Gameplay.Hit.canceled += ctx => weed.StopHit();
     }
 
     float gasMax;

@@ -145,6 +145,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press(pressPoint=0.1)""
+                },
+                {
+                    ""name"": ""Hit"",
+                    ""type"": ""Button"",
+                    ""id"": ""8f2a7578-ed69-4569-ba05-4af865720cb2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(pressPoint=0.1)""
                 }
             ],
             ""bindings"": [
@@ -323,6 +331,17 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""action"": ""LightClipper"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a7a9d3b3-313f-4296-98c0-b7dc5c660f04"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Hit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -347,6 +366,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         m_Gameplay_ToggleCinematicMode = m_Gameplay.FindAction("ToggleCinematicMode", throwIfNotFound: true);
         m_Gameplay_ToggleJoint = m_Gameplay.FindAction("ToggleJoint", throwIfNotFound: true);
         m_Gameplay_LightClipper = m_Gameplay.FindAction("LightClipper", throwIfNotFound: true);
+        m_Gameplay_Hit = m_Gameplay.FindAction("Hit", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -412,6 +432,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_ToggleCinematicMode;
     private readonly InputAction m_Gameplay_ToggleJoint;
     private readonly InputAction m_Gameplay_LightClipper;
+    private readonly InputAction m_Gameplay_Hit;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -432,6 +453,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         public InputAction @ToggleCinematicMode => m_Wrapper.m_Gameplay_ToggleCinematicMode;
         public InputAction @ToggleJoint => m_Wrapper.m_Gameplay_ToggleJoint;
         public InputAction @LightClipper => m_Wrapper.m_Gameplay_LightClipper;
+        public InputAction @Hit => m_Wrapper.m_Gameplay_Hit;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -489,6 +511,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @LightClipper.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLightClipper;
                 @LightClipper.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLightClipper;
                 @LightClipper.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnLightClipper;
+                @Hit.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnHit;
+                @Hit.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnHit;
+                @Hit.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnHit;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -541,6 +566,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @LightClipper.started += instance.OnLightClipper;
                 @LightClipper.performed += instance.OnLightClipper;
                 @LightClipper.canceled += instance.OnLightClipper;
+                @Hit.started += instance.OnHit;
+                @Hit.performed += instance.OnHit;
+                @Hit.canceled += instance.OnHit;
             }
         }
     }
@@ -563,5 +591,6 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         void OnToggleCinematicMode(InputAction.CallbackContext context);
         void OnToggleJoint(InputAction.CallbackContext context);
         void OnLightClipper(InputAction.CallbackContext context);
+        void OnHit(InputAction.CallbackContext context);
     }
 }
