@@ -9,11 +9,14 @@ public class Weed : MonoBehaviour
 
     [SerializeField] GameObject joint;
 
+    List<ParticleSystem> smokes = new List<ParticleSystem>();
+
     float jointSpeed = 0.00000002728f;
     bool jointOnScreen = false, clipperOnScreen = false;
     bool jointUsed = false, clipperUsed = false, hitting = false;
     [SerializeField] ParticleSystem lit;
     [SerializeField] Light litLight;
+    [SerializeField] ParticleSystem jointSmoke;
 
     [SerializeField] GameObject clipper;
     AudioSource clipperAudio;
@@ -50,6 +53,7 @@ public class Weed : MonoBehaviour
         fire.transform.localScale = Vector3.zero;
         clipperSpeed = -(clipperFinalPos - clipper.transform.localPosition) / 200f;
         buttonStartPos = clipperButton.transform.localPosition;
+        InvokeRepeating("SpawnJointSmoke", 1f, 1f);
     }
 
     void Update()
@@ -61,9 +65,15 @@ public class Weed : MonoBehaviour
 
         if (jointLit)
         {
-            if (hitting) 
+            if (hitting)
+            {
                 lit.transform.localScale = new Vector3(0.01f, 0.012f, 0.01f);
-            else lit.transform.localScale = new Vector3(0.007f, 0.009f, 0.007f);
+            }
+
+            else
+            {
+                lit.transform.localScale = new Vector3(0.007f, 0.009f, 0.007f);
+            }
 
             litLight.enabled = true;
         }
@@ -80,6 +90,26 @@ public class Weed : MonoBehaviour
         {
             CancelInvoke("StopLit");
             Invoke("StopLit", 10f);
+        }
+
+    }
+
+    void SpawnJointSmoke()
+    {
+        if(jointLit && (smokes.Count <= 0 || Mathf.Abs(Vector3.Distance(smokes[smokes.Count - 1].transform.position, lit.transform.position)) > 0.05f))
+        {
+            smokes.Add(Instantiate(jointSmoke, lit.transform.position, Quaternion.Euler(270f, 0f, 0f)));
+            Invoke("DeleteSmoke", 15f);
+        }
+          
+    }
+
+    void DeleteSmoke()
+    {
+        if(smokes.Count > 0)
+        {
+            Destroy(smokes[0]);
+            smokes.RemoveAt(0);
         }
     }
 
