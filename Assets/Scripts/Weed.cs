@@ -8,9 +8,12 @@ public class Weed : MonoBehaviour
     PlayerCar car;
 
     [SerializeField] GameObject joint;
-    
+
     float jointSpeed = 0.00000002728f;
-    bool jointOnScreen = false;
+    bool jointOnScreen = false, clipperOnScreen = false;
+    bool jointUsed = false, clipperUsed = false;
+    [SerializeField] ParticleSystem lit;
+    [SerializeField] Light litLight;
 
     [SerializeField] GameObject clipper;
     AudioSource clipperAudio;
@@ -23,6 +26,8 @@ public class Weed : MonoBehaviour
     [SerializeField] Light sparksLight;
     [SerializeField] GameObject clipperButton;
     [SerializeField] GameObject clipperWheel;
+
+
     bool rotating = false;
     float rotationSpeed = 2000f;
 
@@ -51,6 +56,17 @@ public class Weed : MonoBehaviour
             clipperWheel.transform.Rotate(new Vector3(1f, 0f, 0f), Time.deltaTime * rotationSpeed);
         sparksLight.enabled = sparks.isPlaying;
         clipperLight.enabled = fire.transform.localScale != Vector3.zero;
+
+        if (jointLit)
+        {
+            lit.transform.localScale = new Vector3(0.008f, 0.01f, 0.008f);
+            litLight.enabled = true;
+        }
+        else
+        {
+            lit.transform.localScale = Vector3.zero;
+            litLight.enabled = false;
+        }
     }
 
 
@@ -60,10 +76,12 @@ public class Weed : MonoBehaviour
     void IncreaseLitTime()
     {
         timeLit += 0.1f;
-        if(timeLit >= 1.5f && !jointLit)
+        if (timeLit >= 1.5f && !jointLit)
         {
             jointLit = true;
-            print("Joint is lit");
+            clipperSpeed = -clipperSpeed;
+            InvokeRepeating("MoveClipperAnimation", 0f, 0.01f);
+            Invoke("StopClipper", 2f);
         }
     }
 
@@ -79,7 +97,7 @@ public class Weed : MonoBehaviour
 
     void PushButton()
     {
-        if(lastWorked)
+        if (lastWorked)
             clipperButton.transform.localPosition = new Vector3(clipperButton.transform.localPosition.x, clipperButton.transform.localPosition.y, clipperButton.transform.localPosition.z - 0.002f);
         else clipperButton.transform.localPosition = new Vector3(clipperButton.transform.localPosition.x, clipperButton.transform.localPosition.y, clipperButton.transform.localPosition.z - 0.0015f);
     }
@@ -92,7 +110,13 @@ public class Weed : MonoBehaviour
     bool valid = false, lastWorked = false;
     public void LightClipper()
     {
-        if (jointOnScreen && clipper.activeSelf && Mathf.Abs(Vector3.Distance(clipper.transform.localPosition, clipperFinalPos)) < 0.0001f)
+        if(!clipperUsed && jointUsed && NoMoveAnimation())
+        {
+            clipperSpeed = -clipperSpeed;
+            InvokeRepeating("MoveClipperAnimation", 0f, 0.01f);
+            Invoke("StopClipper", 2f);
+        }
+        else if(jointOnScreen && clipper.activeSelf && clipperUsed && NoMoveAnimation())
         {
             if (Random.Range(0, 2) == 1)
             {
@@ -114,6 +138,10 @@ public class Weed : MonoBehaviour
         else valid = false;
     }
 
+    public bool SparkingUp()
+    {
+        return clipperUsed || IsInvoking("StopClipper") || IsInvoking("StopJointAndClipper");
+    }
 
     public void StopLightClipper()
     {
@@ -121,16 +149,20 @@ public class Weed : MonoBehaviour
         //{
         if (IsInvoking("IncreaseLitTime") || valid)
         {
-            if (lastWorked)
-            {
-                CancelInvoke("IncreaseLitTime");
-                clipperButton.transform.localPosition = new Vector3(clipperButton.transform.localPosition.x, clipperButton.transform.localPosition.y, clipperButton.transform.localPosition.z + 0.002f);
-            }
-            else
-            {
-                clipperButton.transform.localPosition = new Vector3(clipperButton.transform.localPosition.x, clipperButton.transform.localPosition.y, clipperButton.transform.localPosition.z + 0.0015f);
-            }
-           
+            //if (!IsInvoking("PushButton"))
+            //{
+                if (lastWorked)
+                {
+                    CancelInvoke("IncreaseLitTime");
+                    clipperButton.transform.localPosition = new Vector3(clipperButton.transform.localPosition.x, clipperButton.transform.localPosition.y, clipperButton.transform.localPosition.z + 0.002f);
+                }
+                else
+                {
+                    clipperButton.transform.localPosition = new Vector3(clipperButton.transform.localPosition.x, clipperButton.transform.localPosition.y, clipperButton.transform.localPosition.z + 0.0015f);
+                }
+            //}
+            
+
         }
 
         timeLit = 0;
@@ -139,44 +171,83 @@ public class Weed : MonoBehaviour
 
     }
 
+    void StopJointAndClipper()
+    {
+        CancelInvoke("MoveJointAndClipperAnimation");
+        if (!jointOnScreen)
+        {
+            joint.SetActive(false);
+        }
+        clipperUsed = !clipperUsed;
+        jointUsed = !jointUsed;
+    }
+
     void StopJoint()
     {
         CancelInvoke("MoveJointAnimation");
         if (!jointOnScreen)
         {
             joint.SetActive(false);
-            clipper.SetActive(false);
         }
-           
-
-            
-
-        counter = 0;
+        jointUsed = !jointUsed;
     }
 
-    
+    void StopClipper()
+    {
+        CancelInvoke("MoveClipperAnimation");
+        if (!clipperOnScreen)
+        {
+        }
+        clipperUsed = !clipperUsed;
+    }
+
+    bool NoMoveAnimation()
+    {
+        return !IsInvoking("StopJointAndClipper") && !IsInvoking("StopJoint") && !IsInvoking("StopClipper");
+    }
 
     public void ToggleJoint()
     {
-        if (!IsInvoking("StopJoint"))
+        if (NoMoveAnimation())
         {
-            jointOnScreen = !jointOnScreen;
-            joint.SetActive(true);
-            clipper.SetActive(true);
-            car.ResetCamera();
-            clipperSpeed = -clipperSpeed;
-            jointSpeed = -jointSpeed;
-            InvokeRepeating("MoveJointAnimation", 0f, 0.01f);
-            Invoke("StopJoint", 2f);
+            if(jointUsed && !clipperUsed)
+            {
+                jointOnScreen = !jointOnScreen;
+                joint.SetActive(true);
+                car.ResetCamera();
+                jointSpeed = -jointSpeed;
+                InvokeRepeating("MoveJointAnimation", 0f, 0.01f);
+                Invoke("StopJoint", 2f);
+            }
+            else
+            {
+                jointOnScreen = !jointOnScreen;
+                clipperOnScreen = !clipperOnScreen;
+                joint.SetActive(true);
+                car.ResetCamera();
+                clipperSpeed = -clipperSpeed;
+                jointSpeed = -jointSpeed;
+                InvokeRepeating("MoveJointAndClipperAnimation", 0f, 0.01f);
+                Invoke("StopJointAndClipper", 2f);
+            }
+            
         }
     }
 
-    int counter = 0;
+    void MoveClipperAnimation()
+    {
+        clipper.transform.localPosition += clipperSpeed;
+    }
+
     void MoveJointAnimation()
+    {
+        joint.transform.localPosition += new Vector3(jointSpeed, -jointSpeed, jointSpeed / 10);
+    }
+
+    void MoveJointAndClipperAnimation()
     {
         clipper.transform.localPosition += clipperSpeed;
         joint.transform.localPosition += new Vector3(jointSpeed, -jointSpeed, jointSpeed / 10);
-        counter++;
     }
 
 }

@@ -256,7 +256,7 @@ public class PlayerCar : MonoBehaviour
     void ChangeCameraDirection()
     {
         float stickError = 0.1f, back = 0.075f;
-        if (!weed.IsInvoking("StopJoint") && !CinematicMode.active && (view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError))
+        if (!weed.SparkingUp() && !weed.IsInvoking("StopJoint") && !CinematicMode.active && (view.x > stickError || -view.x > stickError || view.y > stickError || -view.y > stickError))
         {
             if (!r3)
             {
