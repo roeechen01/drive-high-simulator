@@ -16,9 +16,9 @@ public class PlayerCar : MonoBehaviour
     [SerializeField] FrontWheel frontLeft, frontRight;
     Weed weed;
     Radio radio;
-    public AudioSource engine;
+    [SerializeField] AudioSource engine;
     Rigidbody myRigidbody;
-    public MeshRenderer myRenderer;
+    MeshRenderer myRenderer;
     readonly float tick = 0.1f;
     float soundAddition = 2f;
     float speedAddition = 250f;
@@ -42,6 +42,7 @@ public class PlayerCar : MonoBehaviour
     [SerializeField] bool realDrive = false;
 
     public float TimeNow { get; set; } = 0f;
+
 
 
     private void Awake()
@@ -239,7 +240,7 @@ public class PlayerCar : MonoBehaviour
         cameraShake = myCamera.GetComponent<CameraShake>();
         cinematic = myCamera.GetComponent<CinematicMode>();
         cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
-        ResetCamera();
+        
         if (fps)
             myCamera.transform.position = new Vector3(transform.position.x - 0.35f, transform.position.y + 0.95f, transform.position.z - 0.2f);//FIRST PERSON
         else myCamera.transform.position = new Vector3(transform.position.x - 3f, transform.position.y + 2.95f, transform.position.z - 3f);//THIRD PERSON
@@ -252,6 +253,10 @@ public class PlayerCar : MonoBehaviour
         if (!Application.isEditor)
             speedAddition /= buildDifference;
         else buildDifference = 1;
+
+        myCamera.transform.localPosition = cinematic.positions[0];
+        ResetCamera();
+
     }
 
 
@@ -408,9 +413,12 @@ public class PlayerCar : MonoBehaviour
         TimeNow += tick;
         radio.CheckForNextFreestyleBeat();
     }
+
     void SetCrash()
     {
     }
+
+
     private void OnCollisionEnter(Collision collision)
     {
         GameObject collisionObject = collision.gameObject;
@@ -464,7 +472,7 @@ public class PlayerCar : MonoBehaviour
                     carSounds.Play();
                 }
 
-                multiplier = this.myRigidbody.mass - collisionObject.GetComponent<Rigidbody>().mass;
+                multiplier = myRigidbody.mass - collisionObject.GetComponent<Rigidbody>().mass;
                 currentSpeed *= multiplier;
             }
         }

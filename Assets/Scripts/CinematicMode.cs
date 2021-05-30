@@ -9,7 +9,7 @@ public class CinematicMode : MonoBehaviour
     Transform originalTrans;
     PlayerCar car;
     Camera myCamera;
-    [SerializeField] List<Vector3> positions = new List<Vector3>();
+    public List<Vector3> positions = new List<Vector3>();
     float timeToChange = 30f;
     public static bool active = false;
 
