@@ -8,8 +8,11 @@ public class Weed : MonoBehaviour
     PlayerCar car;
 
     [SerializeField] GameObject joint;
+    [SerializeField] GameObject scenary;
 
-    List<ParticleSystem> smokes = new List<ParticleSystem>();
+    List<ParticleSystem> jointSmokes = new List<ParticleSystem>();
+    List<ParticleSystem> hitSmokes = new List<ParticleSystem>();
+
 
     float jointSpeed = 0.00000002728f;
     bool jointOnScreen = false, clipperOnScreen = false;
@@ -17,6 +20,8 @@ public class Weed : MonoBehaviour
     [SerializeField] ParticleSystem lit;
     [SerializeField] Light litLight;
     [SerializeField] ParticleSystem jointSmoke;
+    [SerializeField] ParticleSystem hitSmoke;
+
 
     [SerializeField] GameObject clipper;
     AudioSource clipperAudio;
@@ -53,7 +58,7 @@ public class Weed : MonoBehaviour
         fire.transform.localScale = Vector3.zero;
         clipperSpeed = -(clipperFinalPos - clipper.transform.localPosition) / 200f;
         buttonStartPos = clipperButton.transform.localPosition;
-        InvokeRepeating("SpawnJointSmoke", 1f, 1f);
+        InvokeRepeating("SpawnJointSmoke", 1f, 0.01f);
     }
 
     void Update()
@@ -96,20 +101,34 @@ public class Weed : MonoBehaviour
 
     void SpawnJointSmoke()
     {
-        if(jointLit && (smokes.Count <= 0 || Mathf.Abs(Vector3.Distance(smokes[smokes.Count - 1].transform.position, lit.transform.position)) > 0.05f))
+        if(jointLit && (jointSmokes.Count <= 0 || Mathf.Abs(Vector3.Distance(jointSmokes[jointSmokes.Count - 1].transform.position, lit.transform.position)) > 0.05f))
         {
-            smokes.Add(Instantiate(jointSmoke, lit.transform.position, Quaternion.Euler(270f, 0f, 0f)));
-            Invoke("DeleteSmoke", 15f);
+            jointSmokes.Add(Instantiate(jointSmoke, lit.transform.position, Quaternion.Euler(270f, 0f, 0f), car.transform));
+            Invoke("DeleteJointSmoke", 15f);
+            Invoke("SetJointSmokeScenary", 2.5f);
         }
           
     }
 
-    void DeleteSmoke()
+    void DeleteJointSmoke()
     {
-        if(smokes.Count > 0)
+        if(jointSmokes.Count > 0)
         {
-            Destroy(smokes[0]);
-            smokes.RemoveAt(0);
+            Destroy(jointSmokes[0]);
+            jointSmokes.RemoveAt(0);
+        }
+    }
+
+    void SetJointSmokeScenary()
+    {
+        for (int i = 0; i < jointSmokes.Count; i++)
+        {
+
+            if (!jointSmokes[i].transform.parent.name.Equals("Scenary"))
+            {
+                jointSmokes[i].transform.SetParent(scenary.transform, true);
+                break;
+            }
         }
     }
 
@@ -120,8 +139,41 @@ public class Weed : MonoBehaviour
 
     public void StopHit()
     {
-        hitting = false;
+        if (hitting && jointLit)
+        {
+            Vector3 position = new Vector3(face.transform.localPosition.x - 0.4f, face.transform.localPosition.y + 0.75f, face.transform.localPosition.z - 1.75f);
+            Quaternion rotation = Quaternion.Euler(face.transform.rotation.eulerAngles.x + 325f, face.transform.rotation.eulerAngles.y, face.transform.rotation.eulerAngles.z);
+            ParticleSystem go = Instantiate(hitSmoke, position, rotation, car.transform);
+            go.transform.localPosition = position;
+            hitSmokes.Add(go);
+            Invoke("DeleteHitSmoke", 5f);
+            Invoke("SetHitSmokeScenary", 1f);
+            hitting = false;
+        }
     }
+
+    void DeleteHitSmoke()
+    {
+        if (hitSmokes.Count > 0)
+        {
+            Destroy(hitSmokes[0]);
+            hitSmokes.RemoveAt(0);
+        }
+    }
+
+    void SetHitSmokeScenary()
+    {
+        for(int i = 0; i < hitSmokes.Count; i++)
+        {
+            if (!hitSmokes[i].transform.parent.name.Equals("Scenary"))
+            {
+                hitSmokes[i].transform.SetParent(scenary.transform, true);
+                break;
+            }
+        }
+    }
+
+    
 
     void StopLit()
     {
