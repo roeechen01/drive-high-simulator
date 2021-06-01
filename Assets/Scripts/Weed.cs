@@ -155,6 +155,8 @@ public class Weed : MonoBehaviour
             ParticleSystem go = Instantiate(hitSmoke, position, rotation, car.transform);
             ParticleSystem.MainModule main = go.main;
             main.startSize = 5 + 4 * hitTimer;
+            float alpha = 0.5f + hitTimer / 5f;
+            main.startColor = new Color(1f, 1f, 1f, (alpha > 1) ? 1 : alpha);
             go.transform.localPosition = position;
             hitSmokes.Add(go);
             Invoke("DeleteHitSmoke", 5f);
