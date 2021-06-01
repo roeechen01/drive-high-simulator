@@ -36,6 +36,9 @@ public class Weed : MonoBehaviour
     Vector3 buttonStartPos;
     [SerializeField] GameObject clipperWheel;
 
+    bool midHit = false;
+    float hitTimer = 0;
+    float high = 0;
 
     bool rotating = false;
     float rotationSpeed = 2000f;
@@ -58,9 +61,9 @@ public class Weed : MonoBehaviour
         fire.transform.localScale = Vector3.zero;
         clipperSpeed = -(clipperFinalPos - clipper.transform.localPosition) / 200f;
         buttonStartPos = clipperButton.transform.localPosition;
-        InvokeRepeating("SpawnJointSmoke", 1f, 0.01f);
+        InvokeRepeating("SpawnJointSmoke", 1f, 0.5f);
+        InvokeRepeating("DropHigh", 1f, 60f);
     }
-
     void Update()
     {
         if (rotating)
@@ -73,6 +76,12 @@ public class Weed : MonoBehaviour
             if (hitting)
             {
                 lit.transform.localScale = new Vector3(0.01f, 0.012f, 0.01f);
+                if (!midHit)
+                {
+                    midHit = true;
+                    InvokeRepeating("AddToHitTimer", 0f, 0.1f);
+                }
+                    
             }
 
             else
@@ -94,18 +103,18 @@ public class Weed : MonoBehaviour
         if (hitting && jointLit)
         {
             CancelInvoke("StopLit");
-            Invoke("StopLit", 10f);
+            Invoke("StopLit", 30f);
         }
 
     }
 
     void SpawnJointSmoke()
     {
-        if(jointLit && (jointSmokes.Count <= 0 || Mathf.Abs(Vector3.Distance(jointSmokes[jointSmokes.Count - 1].transform.position, lit.transform.position)) > 0.05f))
+        if(jointLit && jointSmokes.Count <= 50/*&& (jointSmokes.Count <= 0 || Mathf.Abs(Vector3.Distance(jointSmokes[jointSmokes.Count - 1].transform.position, lit.transform.position)) > 0.05f)*/)
         {
             jointSmokes.Add(Instantiate(jointSmoke, lit.transform.position, Quaternion.Euler(270f, 0f, 0f), car.transform));
-            Invoke("DeleteJointSmoke", 15f);
-            Invoke("SetJointSmokeScenary", 2.5f);
+            Invoke("DeleteJointSmoke", 10f);
+            Invoke("SetJointSmokeScenary", 1f);
         }
           
     }
@@ -144,12 +153,31 @@ public class Weed : MonoBehaviour
             Vector3 position = new Vector3(face.transform.localPosition.x - 0.4f, face.transform.localPosition.y + 0.75f, face.transform.localPosition.z - 1.75f);
             Quaternion rotation = Quaternion.Euler(face.transform.rotation.eulerAngles.x + 325f, face.transform.rotation.eulerAngles.y, face.transform.rotation.eulerAngles.z);
             ParticleSystem go = Instantiate(hitSmoke, position, rotation, car.transform);
+            ParticleSystem.MainModule main = go.main;
+            main.startSize = 5 + 4 * hitTimer;
             go.transform.localPosition = position;
             hitSmokes.Add(go);
             Invoke("DeleteHitSmoke", 5f);
             Invoke("SetHitSmokeScenary", 1f);
             hitting = false;
+            midHit = false;
+            high += hitTimer;
+            hitTimer = 0;
+            CancelInvoke("AddToHitTimer");
         }
+    }
+
+    void DropHigh()
+    {
+        if(high >= 1)
+            high -= 1f;
+    }
+
+    void AddToHitTimer()
+    {
+        hitTimer += 0.1f;
+        if(hitTimer >= 5f)
+            StopHit();
     }
 
     void DeleteHitSmoke()
