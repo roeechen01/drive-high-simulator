@@ -10,6 +10,9 @@ public class Weed : MonoBehaviour
     [SerializeField] GameObject joint;
     [SerializeField] GameObject scenary;
 
+    AudioSource coughSource;
+    [SerializeField] AudioClip[] coughSounds;
+
     List<ParticleSystem> jointSmokes = new List<ParticleSystem>();
     List<ParticleSystem> hitSmokes = new List<ParticleSystem>();
 
@@ -56,6 +59,7 @@ public class Weed : MonoBehaviour
     {
         face = GetComponent<Camera>();
         car = FindObjectOfType<PlayerCar>();
+        coughSource = GetComponent<AudioSource>();
         clipperAudio = clipper.GetComponent<AudioSource>();
         fireScale = fire.transform.localScale;
         fire.transform.localScale = Vector3.zero;
@@ -143,7 +147,8 @@ public class Weed : MonoBehaviour
 
     public void Hit()
     {
-        hitting = true;
+        if(!coughSource.isPlaying)
+            hitting = true;
     }
 
     public void StopHit()
@@ -163,9 +168,16 @@ public class Weed : MonoBehaviour
             Invoke("SetHitSmokeScenary", 1f);
             hitting = false;
             midHit = false;
+            if(Random.Range(0f, 5f) <= hitTimer)
+            {
+                coughSource.volume = 0.75f + hitTimer / 22; 
+                coughSource.clip = coughSounds[Random.Range(0, coughSounds.Length)];
+                coughSource.Play();
+            }
             high += hitTimer;
             hitTimer = 0;
             CancelInvoke("AddToHitTimer");
+            
         }
     }
 
