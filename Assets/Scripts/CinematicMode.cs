@@ -8,7 +8,9 @@ public class CinematicMode : MonoBehaviour
     RaycastHit hit;
     Transform originalTrans;
     PlayerCar car;
-    Camera myCamera;
+    Camera face;
+    Camera cinematicCamera;
+
     public List<Vector3> positions = new List<Vector3>();
     float timeToChange = 30f;
     public static bool active = false;
@@ -22,15 +24,27 @@ public class CinematicMode : MonoBehaviour
     void Start()
     {
         car = FindObjectOfType<PlayerCar>();
-        myCamera = GetComponentInChildren<Camera>();
+        face = FindFaceCamera();
+        cinematicCamera = GetComponent<Camera>();
+    }
+
+    public static Camera FindFaceCamera()
+    {
+        Camera[] cameras = FindObjectsOfType<Camera>();
+        foreach(Camera camera in cameras)
+        {
+            if (!camera.GetComponent<CinematicMode>())
+                return camera;
+        }
+        return null;
     }
 
     void ResetCamera()
     {
         if (CinematicMode.active)
         {
-            myCamera.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
-            myCamera.transform.LookAt(car.transform);
+            face.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            face.transform.LookAt(car.transform);
         }
            
     }
@@ -50,7 +64,7 @@ public class CinematicMode : MonoBehaviour
         //if (active)
             //myCamera.transform.LookAt(car.transform);
 
-        if (!IsInvoking("Check") && NonCarHit(Physics.RaycastAll(transform.position, car.transform.position - myCamera.transform.position, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
+        if (!IsInvoking("Check") && NonCarHit(Physics.RaycastAll(transform.position, car.transform.position - cinematicCamera.transform.position, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
             StartCheck();
         ChangeCameraDirection();
     }
@@ -70,7 +84,7 @@ public class CinematicMode : MonoBehaviour
     void Check()
     {
         counter -= 0.1f;
-        if (NonCarHit(Physics.RaycastAll(transform.position, car.transform.position - myCamera.transform.position, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
+        if (NonCarHit(Physics.RaycastAll(transform.position, car.transform.position - cinematicCamera.transform.position, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
         {
             if (counter <= 0)
             {
@@ -96,23 +110,31 @@ public class CinematicMode : MonoBehaviour
 
     void StartCinematic()
     {
+        face.enabled = false;
+        face.GetComponent<AudioListener>().enabled = false;
+        cinematicCamera.enabled = true;
+        cinematicCamera.GetComponent<AudioListener>().enabled = true;
         active = true;
         InvokeRepeating("ChangePosition", 0f, timeToChange);
     }
 
     void EndCinematic()
     {
+        face.enabled = true;
+        face.GetComponent<AudioListener>().enabled = true;
+        cinematicCamera.enabled = false;
+        face.GetComponent<AudioListener>().enabled = false;
         CancelInvoke("ChangePosition");
         active = false;
-        myCamera.transform.localPosition = positions[0];
+        cinematicCamera.transform.localPosition = positions[0];
         car.ResetCamera();
         //myCamera.transform.rotation = originalTrans.rotation;
     }
     
     void ChangePosition()
     {
-        myCamera.transform.localPosition = positions[Random.Range(1, positions.Count)];
-        myCamera.transform.LookAt(car.transform);
+        cinematicCamera.transform.localPosition = positions[Random.Range(1, positions.Count)];
+        cinematicCamera.transform.LookAt(car.transform);
         if (NonCarHit(Physics.RaycastAll(transform.position, transform.forward, Mathf.Abs(Vector3.Distance(transform.position, car.transform.position)))))
             ChangePosition();
     }
@@ -123,8 +145,8 @@ public class CinematicMode : MonoBehaviour
         {
             Vector2 view = car.GetView();
             float rotationSpeed = 50f;
-            myCamera.transform.Rotate(-view.y * Time.deltaTime * rotationSpeed, view.x * Time.deltaTime * rotationSpeed, 0f);
-            myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y, 0f);
+            cinematicCamera.transform.Rotate(-view.y * Time.deltaTime * rotationSpeed, view.x * Time.deltaTime * rotationSpeed, 0f);
+            cinematicCamera.transform.localRotation = Quaternion.Euler(cinematicCamera.transform.localRotation.eulerAngles.x, cinematicCamera.transform.localRotation.eulerAngles.y, 0f);
             //myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y, 0f);
         }
 

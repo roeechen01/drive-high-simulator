@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -57,7 +56,7 @@ public class Weed : MonoBehaviour
 
     void Start()
     {
-        face = GetComponent<Camera>();
+        face = CinematicMode.FindFaceCamera();
         car = FindObjectOfType<PlayerCar>();
         coughSource = GetComponent<AudioSource>();
         clipperAudio = clipper.GetComponent<AudioSource>();
@@ -130,6 +129,7 @@ public class Weed : MonoBehaviour
             Destroy(jointSmokes[0]);
             jointSmokes.RemoveAt(0);
         }
+
     }
 
     void SetJointSmokeScenary()

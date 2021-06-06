@@ -235,10 +235,10 @@ public class PlayerCar : MonoBehaviour
     void Start()
     {
         myRigidbody = GetComponent<Rigidbody>();
-        myCamera = FindObjectOfType<Camera>();
+        myCamera = CinematicMode.FindFaceCamera();
         myRenderer = GetComponent<MeshRenderer>();
         cameraShake = myCamera.GetComponent<CameraShake>();
-        cinematic = myCamera.GetComponent<CinematicMode>();
+        cinematic = FindObjectOfType<CinematicMode>();
         cameraDefaultRotation = Quaternion.Euler(10, 0, 0);
         
         if (fps)
