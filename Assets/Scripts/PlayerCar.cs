@@ -69,7 +69,7 @@ public class PlayerCar : MonoBehaviour
 
         controls.Gameplay.Quit.performed += ctx => Application.Quit();
 
-        controls.Gameplay.Restart.performed += ctx => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        controls.Gameplay.Restart.performed += ctx => RestartScene();
 
         controls.Gameplay.ToggleJoint.performed += ctx => weed.ToggleJoint();
 
@@ -83,6 +83,12 @@ public class PlayerCar : MonoBehaviour
     float gasMax;
     float brakesForSound = 0.75f;
     bool finishedBrakes = true;
+
+    void RestartScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        CinematicMode.active = false;
+    }
 
     void ToggleCinematic()
     {

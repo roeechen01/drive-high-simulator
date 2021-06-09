@@ -24,6 +24,7 @@ public class Radio : MonoBehaviour
     int stationIndex = 0;
     float clockTime = 0f;
     public static float minuteTime = 1f;
+    Weed joint;
 
     private void Awake()
     {
@@ -43,12 +44,13 @@ public class Radio : MonoBehaviour
     void Start()
     {
         playerCar = GetComponent<PlayerCar>();
+        joint = FindObjectOfType<Weed>();
         clockTime = Random.Range(0, 1441);
         baseClockScale = clockText.transform.localScale;
         SetClock();
         InvokeRepeating("AddMinute", 0f, minuteTime);
         ShuffleArray(freestyleBeats);
-        radio.volume = 0.5f;
+        radio.volume = 0.25f;
         float maxLength = 0f;
         for (int i = 0; i < radioStations.Length; i++)
             if (radioStations[i].length > maxLength)
@@ -249,12 +251,13 @@ public class Radio : MonoBehaviour
         }
         else if (clockTime == 260 || clockTime == 980)
         {
-            if (IsInvoking("Greener"))
-                CancelInvoke("Greener");
+            float _420time = 69f;
+            if(CinematicMode.active)
+                joint.AutoSmoke(_420time);
             clockText.color = new Color(0f, 0.5f, 0f);
             InvokeRepeating("IncreaseClockSize", timeToChange, timeToChange);
             CancelInvoke("AddMinute");
-            InvokeRepeating("AddMinute", 69f, minuteTime);
+            InvokeRepeating("AddMinute", _420time, minuteTime);
         }
         else
         {
@@ -264,26 +267,6 @@ public class Radio : MonoBehaviour
         SetClock();
         lightCycle.UpdateLight(clockTime);
     }
-
-    /*void Greener()
-    {
-        clockText.color = new Color(clockText.color.r - otherStep, clockText.color.g - greenStep, clockText.color.b - otherStep);
-
-        if (clockText.color.r > 1f - otherStep)
-            clockText.color = new Color(0f, clockText.color.g, clockText.color.b);
-        if (clockText.color.b > 1f - otherStep)
-            clockText.color = new Color(clockText.color.r, clockText.color.g, 0f);
-
-        greenerCounter--;
-        if(greenerCounter <= 0)
-        {
-            greenerCounter = 20;
-            CancelInvoke("Greener");
-        }
-        print(clockText.color.g);
-            
-    }*/
-
     
     void IncreaseClockSize()
     {
@@ -294,6 +277,11 @@ public class Radio : MonoBehaviour
             CancelInvoke("IncreaseClockSize");
             InvokeRepeating("DecreaseClockSize", timeToChange, timeToChange);
         }    
+    }
+
+    public bool Is420()
+    {
+        return clockTime == 260 || clockTime == 980;
     }
 
     void DecreaseClockSize()

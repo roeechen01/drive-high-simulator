@@ -110,11 +110,15 @@ public class CinematicMode : MonoBehaviour
 
     void StartCinematic()
     {
-        face.enabled = false;
-        face.GetComponent<AudioListener>().enabled = false;
         cinematicCamera.enabled = true;
         cinematicCamera.GetComponent<AudioListener>().enabled = true;
-        active = true;
+        face.enabled = false;
+        face.GetComponent<AudioListener>().enabled = false;
+        
+        if(FindObjectOfType<Radio>().Is420())
+            FindObjectOfType<Weed>().AutoSmoke(69f);
+
+            active = true;
         InvokeRepeating("ChangePosition", 0f, timeToChange);
     }
 
@@ -128,6 +132,7 @@ public class CinematicMode : MonoBehaviour
         active = false;
         cinematicCamera.transform.localPosition = positions[0];
         car.ResetCamera();
+        FindObjectOfType<Weed>().CancelAutoSmoke();
         //myCamera.transform.rotation = originalTrans.rotation;
     }
     

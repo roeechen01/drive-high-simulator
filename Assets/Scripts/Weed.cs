@@ -17,7 +17,7 @@ public class Weed : MonoBehaviour
 
 
     float jointSpeed = 0.00000002728f;
-    bool jointOnScreen = false, clipperOnScreen = false;
+    bool jointOnScreen = false;
     bool jointUsed = false, clipperUsed = false, hitting = false;
     [SerializeField] ParticleSystem lit;
     [SerializeField] Light litLight;
@@ -43,6 +43,7 @@ public class Weed : MonoBehaviour
     float high = 0;
 
     bool rotating = false;
+    bool squareOn = false;
     float rotationSpeed = 2000f;
 
     Camera face;
@@ -110,6 +111,55 @@ public class Weed : MonoBehaviour
         }
 
     }
+
+    //Automatic smoke mechanincs
+    public void AutoSmoke(float seconds)
+    {
+        Invoke("CancelAutoSmoke", seconds);
+        if (!squareOn)
+            ToggleJoint();
+        Invoke("AutoLightClipper", 2f);
+
+    }
+
+    void AutoLightClipper()
+    {
+        LightClipper();
+        if (!lastWorked || Mathf.Abs(Vector3.Distance(clipper.transform.localPosition, clipperFinalPos)) > 0.00021f)
+        {
+            Invoke("AutoLightClipper", 0.75f);
+            
+        }
+
+        else
+        {
+            AutoHit();
+            Invoke("StopLightClipper", 3f);
+        }
+    }
+
+    void AutoHit()
+    {
+        Hit();
+        float hitLength = Random.Range(0.5f, 3f);
+        Invoke("AutoStopHit", hitLength);
+    }
+
+    void AutoStopHit()
+    {
+        StopHit();
+        float hitDelay = Random.Range(3f, 10f);
+        Invoke("AutoHit", hitDelay);
+    }
+
+    public void CancelAutoSmoke()
+    {
+        CancelInvoke("AutoHit");
+        CancelInvoke("AutoStopHit");
+        CancelInvoke("AutoLightClipper");
+    }
+
+    //Ending of automatic smoke mechanics
 
     void SpawnJointSmoke()
     {
@@ -272,6 +322,7 @@ public class Weed : MonoBehaviour
         }
         else if(jointOnScreen && clipper.activeSelf && clipperUsed && NoMoveAnimation())
         {
+            clipperButton.transform.localPosition = buttonStartPos;
             if (Random.Range(0, 2) == 1)
             {
                 InvokeRepeating("IncreaseLitTime", 0.1f, 0.1f);
@@ -286,6 +337,7 @@ public class Weed : MonoBehaviour
                 RotateWheel(0.15f, 0.1f);
                 lastWorked = false;
                 sparks.Play();
+                StopLightClipper();
             }
             valid = true;
         }
@@ -305,11 +357,11 @@ public class Weed : MonoBehaviour
         {
                 if (lastWorked)
                     CancelInvoke("IncreaseLitTime");
-            clipperButton.transform.localPosition = buttonStartPos;
+            //clipperButton.transform.localPosition = buttonStartPos;
             
 
         }
-
+        clipperButton.transform.localPosition = buttonStartPos;
         timeLit = 0;
         fire.transform.localScale = Vector3.zero;
         //}
@@ -340,9 +392,6 @@ public class Weed : MonoBehaviour
     void StopClipper()
     {
         CancelInvoke("MoveClipperAnimation");
-        if (!clipperOnScreen)
-        {
-        }
         clipperUsed = !clipperUsed;
     }
 
@@ -355,6 +404,7 @@ public class Weed : MonoBehaviour
     {
         if (NoMoveAnimation())
         {
+            squareOn = !squareOn;
             if(jointUsed && !clipperUsed)
             {
                 jointOnScreen = !jointOnScreen;
@@ -367,7 +417,6 @@ public class Weed : MonoBehaviour
             else
             {
                 jointOnScreen = !jointOnScreen;
-                clipperOnScreen = !clipperOnScreen;
                 joint.SetActive(true);
                 car.ResetCamera();
                 clipperSpeed = -clipperSpeed;
