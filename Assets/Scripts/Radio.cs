@@ -25,6 +25,8 @@ public class Radio : MonoBehaviour
     float clockTime = 0f;
     public static float minuteTime = 1f;
     Weed joint;
+    [SerializeField] Material moonMaterial;
+    [SerializeField] GameObject moon;
 
     private void Awake()
     {
@@ -224,6 +226,7 @@ public class Radio : MonoBehaviour
     float timeToChange = 0.125f;
     void AddMinute()
     {
+        UpdateMoonAlpha();
         if (IsInvoking("IncreaseClockSize"))
             CancelInvoke("IncreaseClockSize");
         else if (IsInvoking("DecreaseClockSize"))
@@ -266,6 +269,31 @@ public class Radio : MonoBehaviour
         }
         SetClock();
         lightCycle.UpdateLight(clockTime);
+    }
+
+    void UpdateMoonAlpha()
+    {
+        //moonMaterial.color = new Color(255f, 255f, 255f, 0f);
+
+        //1140 - 7PM, 270 - 4:30AM
+        if (clockTime > 1140 || clockTime < 270)
+        {
+            moon.SetActive(true);
+            float alpha = 0f;
+            float num;
+            if (clockTime > 1140)
+                num = clockTime - 1140;
+            else num = 300 + clockTime;
+            //middle : num = 285
+            float difference = Mathf.Abs(285 - num);
+            alpha = 1f - difference / 500f;
+
+
+            print(alpha);
+            moonMaterial.color = new Color(1f, 1f, 1f, alpha);
+        }
+        else moon.SetActive(false);
+
     }
     
     void IncreaseClockSize()
