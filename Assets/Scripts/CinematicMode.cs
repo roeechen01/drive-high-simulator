@@ -149,7 +149,7 @@ public class CinematicMode : MonoBehaviour
         if (CinematicMode.active)
         {
             Vector2 view = car.GetView();
-            float rotationSpeed = 50f;
+            float rotationSpeed = 150f;
             cinematicCamera.transform.Rotate(-view.y * Time.deltaTime * rotationSpeed, view.x * Time.deltaTime * rotationSpeed, 0f);
             cinematicCamera.transform.localRotation = Quaternion.Euler(cinematicCamera.transform.localRotation.eulerAngles.x, cinematicCamera.transform.localRotation.eulerAngles.y, 0f);
             //myCamera.transform.localRotation = Quaternion.Euler(myCamera.transform.localRotation.eulerAngles.x, myCamera.transform.localRotation.eulerAngles.y, 0f);
