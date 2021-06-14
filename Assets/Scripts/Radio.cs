@@ -159,8 +159,15 @@ public class Radio : MonoBehaviour
             }
             radio.Play();
         }
+
+        if (radioText.text.Equals("Haknufia"))
+            radio.volume /= 2;
+
         radioText.text = radioStationsNames[index];
         radioText.font = radioStationsFonts[index];
+
+        if (radioText.text.Equals("Haknufia"))
+            radio.volume *= 2;
         //radioText.fontStyle = FontStyle.Bold;
     }
 

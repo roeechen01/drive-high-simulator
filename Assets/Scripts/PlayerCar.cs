@@ -174,7 +174,7 @@ public class PlayerCar : MonoBehaviour
             currentSound = 100;
         //if (currentSound <= soundAddition && Mathf.Abs(currentSpeed) > 0)
         // currentSound = (Mathf.Abs(currentSpeed) / -1 * reverseMax) * 100;
-        engine.volume = 0.3f/*0.8f*/ * (currentSound / 100);
+        engine.volume = 0.15f/*0.8f*/ * (currentSound / 100);
 
         // if (this.myRigidbody.velocity == Vector3.zero)
         // currentSpeed = 0;
