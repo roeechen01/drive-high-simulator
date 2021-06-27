@@ -112,6 +112,15 @@ public class Weed : MonoBehaviour
 
     }
 
+    public void SetJointStuffIfNotSet()
+    {
+        if (!squareOn)
+            ToggleJoint();
+        else
+            if (!clipperUsed)
+            LightClipper();
+    }
+
     //Automatic smoke mechanincs
     public void AutoSmoke(float seconds)
     {

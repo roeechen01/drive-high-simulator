@@ -28953,8 +28953,8 @@ MonoBehaviour:
   - Playback FM
   - SF-UR
   - VCPR
-  - Freestyle Nation
   - Haknufia
+  - Freestyle Nation
   radioStationsFonts:
   - {fileID: 12800000, guid: b4254f4b6e1fb6b45acd9cf0fd4a211c, type: 3}
   - {fileID: 12800000, guid: 28edbda8ae524a943818ce9362cd6a8c, type: 3}
@@ -28964,8 +28964,8 @@ MonoBehaviour:
   - {fileID: 12800000, guid: a8bc7e448322f2844bd050f4b0766fb5, type: 3}
   - {fileID: 12800000, guid: 2b74945e2fd2cf34a816c4e715da536b, type: 3}
   - {fileID: 12800000, guid: b4254f4b6e1fb6b45acd9cf0fd4a211c, type: 3}
-  - {fileID: 12800000, guid: 1ed7f244882e7a74bbf2602b41dd3800, type: 3}
   - {fileID: 12800000, guid: df330e261edb49a41a5855b82608307e, type: 3}
+  - {fileID: 12800000, guid: 1ed7f244882e7a74bbf2602b41dd3800, type: 3}
   radioText: {fileID: 1574409402}
   clockText: {fileID: 1472480907}
   lightCycle: {fileID: 705507996}
@@ -28980,6 +28980,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: d38f8ce57d86b424d83f53785ff86bf6, type: 3}
   - {fileID: 8300000, guid: 00407017234b4ac4a96d1fcc8f3ff2ae, type: 3}
   - {fileID: 8300000, guid: 23692cd03ac651341b3d79b830e52cad, type: 3}
+  respectClip: {fileID: 8300000, guid: a23bbf1a2cc3e094d9413e09a6712969, type: 3}
   freestyleBeats:
   - {fileID: 8300000, guid: 6b85e773335e08a46b0caf2e5be96896, type: 3}
   - {fileID: 8300000, guid: a5eb5a21eb20828449e79d254c48a27a, type: 3}

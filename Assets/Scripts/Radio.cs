@@ -17,6 +17,7 @@ public class Radio : MonoBehaviour
     [SerializeField] LightCycle lightCycle;
     public Text speedText;
     public AudioClip[] radioStations;
+    [SerializeField] AudioClip respectClip;
     float[] stationsDelays;
     public AudioClip[] freestyleBeats;
     readonly bool shuffleBeatsEveryLoop = false; //Change frestyle beats order every loop finish
@@ -47,7 +48,8 @@ public class Radio : MonoBehaviour
     {
         playerCar = GetComponent<PlayerCar>();
         joint = FindObjectOfType<Weed>();
-        clockTime = Random.Range(0, 1441);
+        //clockTime = Random.Range(0, 1441);
+        clockTime = 210f;
         baseClockScale = clockText.transform.localScale;
         SetClock();
         InvokeRepeating("AddMinute", 0f, minuteTime);
@@ -124,6 +126,8 @@ public class Radio : MonoBehaviour
 
     void PlayStation(int index, float time)
     {
+        if (respecting)
+            return;
         radio.loop = true;
         if (index != radioStations.Length)
         {
@@ -221,14 +225,42 @@ public class Radio : MonoBehaviour
         if (clockTime == 260 || clockTime == 980)
         {
             clockText.enabled = true;
+            if(!respecting && !wasOnThis420)
+                PlayRespect();
         }
         else clockText.enabled = radioText.enabled;
+        if (clockTime == 261 || clockTime == 981)
+            wasOnThis420 = false;
+        if (respecting)
+            radio.volume = 1f;
+    }
+
+    float oldVolume;
+    bool respecting = false, wasOnThis420 = false;
+    void PlayRespect()
+    {
+        if(!CinematicMode.active)
+            FindObjectOfType<Weed>().SetJointStuffIfNotSet();
+        wasOnThis420 = true;
+        respecting = true;
+        oldVolume = radio.volume;
+        radio.Stop();
+        radio.volume = 1f;
+        radio.time = 0f;
+        radio.clip = respectClip;
+        radio.Play();
+        Invoke("RespectEnd", 7f);
+    }
+
+    void RespectEnd()
+    {
+        respecting = false;
+        radio.Stop();
+        radio.volume = oldVolume;
+        PlayStation(stationIndex, playerCar.TimeNow);
     }
 
     static float counter = 138;
-    //float greenerCounter = 20;
-    //float greenStep = 0.01931373f / 2;
-    //float otherStep = 0.049f / 2;
     float step = 0.0035f;
     float timeToChange = 0.125f;
     void AddMinute()
