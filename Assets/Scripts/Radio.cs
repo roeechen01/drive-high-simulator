@@ -48,8 +48,7 @@ public class Radio : MonoBehaviour
     {
         playerCar = GetComponent<PlayerCar>();
         joint = FindObjectOfType<Weed>();
-        //clockTime = Random.Range(0, 1441);
-        clockTime = 252f;
+        clockTime = (int)Random.Range(0, 1441);
         baseClockScale = clockText.transform.localScale;
         SetClock();
         InvokeRepeating("AddMinute", 0f, minuteTime);
@@ -66,6 +65,20 @@ public class Radio : MonoBehaviour
         }
         playerCar.TimeNow = Random.Range(0, maxLength);
         PlayStation(stationIndex, playerCar.TimeNow);
+    }
+
+    int RandomClockTime()
+    {
+        int rnd = Random.Range(0, 100);
+        if (rnd < 3)
+            return 260;
+        else if (rnd < 6)
+                return 980;
+        else if(rnd < 15)
+            return 260 - Random.Range(15, 60);
+        else if(rnd < 25)
+            return 980 - Random.Range(15, 60);
+        return Random.Range(0, 1441);
     }
 
     private void OnEnable()
