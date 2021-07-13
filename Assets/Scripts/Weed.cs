@@ -37,7 +37,6 @@ public class Weed : MonoBehaviour
     [SerializeField] GameObject clipperButton;
     Vector3 buttonStartPos;
     [SerializeField] GameObject clipperWheel;
-    [SerializeField] bool NSFW;
 
     bool midHit = false;
     float hitTimer = 0;
@@ -48,17 +47,12 @@ public class Weed : MonoBehaviour
     float rotationSpeed = 2000f;
 
     Camera face;
-
+    [SerializeField] bool NSFW;
 
     private void Awake()
     {
         controls = new PlayerControls();
         controls.Gameplay.ToggleJoint.performed += ctx => ToggleJoint();
-        if (NSFW)
-        {
-            joint.SetActive(false);
-            clipper.SetActive(false);
-        }
     }
 
     void Start()
@@ -116,15 +110,6 @@ public class Weed : MonoBehaviour
             Invoke("StopLit", 30f);
         }
 
-    }
-
-    public void SetJointStuffIfNotSet()
-    {
-        if (!squareOn)
-            ToggleJoint();
-        else
-            if (!clipperUsed)
-            LightClipper();
     }
 
     //Automatic smoke mechanincs
@@ -386,6 +371,10 @@ public class Weed : MonoBehaviour
     void StopJointAndClipper()
     {
         CancelInvoke("MoveJointAndClipperAnimation");
+        if (!jointOnScreen)
+        {
+            joint.SetActive(false);
+        }
         clipperUsed = !clipperUsed;
         jointUsed = !jointUsed;
     }
@@ -393,6 +382,10 @@ public class Weed : MonoBehaviour
     void StopJoint()
     {
         CancelInvoke("MoveJointAnimation");
+        if (!jointOnScreen)
+        {
+            joint.SetActive(false);
+        }
         jointUsed = !jointUsed;
     }
 
@@ -415,6 +408,7 @@ public class Weed : MonoBehaviour
             if(jointUsed && !clipperUsed)
             {
                 jointOnScreen = !jointOnScreen;
+                joint.SetActive(true);
                 car.ResetCamera();
                 jointSpeed = -jointSpeed;
                 InvokeRepeating("MoveJointAnimation", 0f, 0.01f);
@@ -423,6 +417,7 @@ public class Weed : MonoBehaviour
             else
             {
                 jointOnScreen = !jointOnScreen;
+                joint.SetActive(true);
                 car.ResetCamera();
                 clipperSpeed = -clipperSpeed;
                 jointSpeed = -jointSpeed;

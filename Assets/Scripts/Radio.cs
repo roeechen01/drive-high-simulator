@@ -17,7 +17,6 @@ public class Radio : MonoBehaviour
     [SerializeField] LightCycle lightCycle;
     public Text speedText;
     public AudioClip[] radioStations;
-    [SerializeField] AudioClip respectClip;
     float[] stationsDelays;
     public AudioClip[] freestyleBeats;
     readonly bool shuffleBeatsEveryLoop = false; //Change frestyle beats order every loop finish
@@ -48,7 +47,7 @@ public class Radio : MonoBehaviour
     {
         playerCar = GetComponent<PlayerCar>();
         joint = FindObjectOfType<Weed>();
-        clockTime = (int)Random.Range(0, 1441);
+        clockTime = Random.Range(0, 1441);
         baseClockScale = clockText.transform.localScale;
         SetClock();
         InvokeRepeating("AddMinute", 0f, minuteTime);
@@ -67,20 +66,6 @@ public class Radio : MonoBehaviour
         PlayStation(stationIndex, playerCar.TimeNow);
     }
 
-    int RandomClockTime()
-    {
-        int rnd = Random.Range(0, 100);
-        if (rnd < 3)
-            return 260;
-        else if (rnd < 6)
-                return 980;
-        else if(rnd < 15)
-            return 260 - Random.Range(15, 60);
-        else if(rnd < 25)
-            return 980 - Random.Range(15, 60);
-        return Random.Range(0, 1441);
-    }
-
     private void OnEnable()
     {
         controls.Gameplay.Enable();
@@ -93,13 +78,13 @@ public class Radio : MonoBehaviour
 
     void RepeatVolUp()
     {
-        if (!IsInvoking("VolUp") && !IsInvoking("VolDown") && !fadingOut)
+        if (!IsInvoking("VolUp") && !IsInvoking("VolDown"))
             InvokeRepeating("VolUp", 0f, 0.1f);
     }
 
     void RepeatVolDown()
     {
-        if (!IsInvoking("VolUp") && !IsInvoking("VolDown") && !fadingOut)
+        if (!IsInvoking("VolUp") && !IsInvoking("VolDown"))
             InvokeRepeating("VolDown", 0f, 0.1f);
     }
 
@@ -139,8 +124,6 @@ public class Radio : MonoBehaviour
 
     void PlayStation(int index, float time)
     {
-        if (respecting)
-            return;
         radio.loop = true;
         if (index != radioStations.Length)
         {
@@ -235,67 +218,17 @@ public class Radio : MonoBehaviour
 
     void Update()
     {
-        if ((clockTime == 257 || clockTime == 977) && !fadingOut)
-            StartFadeOut();
         if (clockTime == 260 || clockTime == 980)
         {
             clockText.enabled = true;
-            if(!respecting && !wasOnThis420)
-                PlayRespect();
         }
         else clockText.enabled = radioText.enabled;
-        if (clockTime == 261 || clockTime == 981)
-            wasOnThis420 = false;
-        if (respecting)
-            radio.volume = 1f;
-    }
-
-    float oldVolume = 1f;
-    bool respecting = false, wasOnThis420 = false;
-
-    float volDec;
-    bool fadingOut = false;
-    void StartFadeOut()
-    {
-        fadingOut = true;
-        oldVolume = radio.volume;
-        volDec = radio.volume / 30f;
-        InvokeRepeating("DecVol", 0.1f, 0.1f);
-        Invoke("FadeOutEnd", 3f);
-    }
-    void DecVol()
-    {
-        radio.volume -= volDec;
-    }
-
-    void FadeOutEnd()
-    {
-        CancelInvoke("DecVol");
-        fadingOut = false;
-    }
-    void PlayRespect()
-    {
-        if(!CinematicMode.active)
-            FindObjectOfType<Weed>().SetJointStuffIfNotSet();
-        wasOnThis420 = true;
-        respecting = true;
-        radio.Stop();
-        radio.volume = 1f;
-        radio.time = 0f;
-        radio.clip = respectClip;
-        radio.Play();
-        Invoke("RespectEnd", 7f);
-    }
-
-    void RespectEnd()
-    {
-        respecting = false;
-        radio.Stop();
-        radio.volume = oldVolume;
-        PlayStation(stationIndex, playerCar.TimeNow);
     }
 
     static float counter = 138;
+    //float greenerCounter = 20;
+    //float greenStep = 0.01931373f / 2;
+    //float otherStep = 0.049f / 2;
     float step = 0.0035f;
     float timeToChange = 0.125f;
     void AddMinute()
@@ -345,8 +278,6 @@ public class Radio : MonoBehaviour
         lightCycle.UpdateLight(clockTime);
     }
 
-  
-
     void UpdateMoonAlpha()
     {
         //moonMaterial.color = new Color(255f, 255f, 255f, 0f);
@@ -364,6 +295,8 @@ public class Radio : MonoBehaviour
             float difference = Mathf.Abs(285 - num);
             alpha = 1f - difference / 500f;
 
+
+            print(alpha);
             moonMaterial.color = new Color(1f, 1f, 1f, alpha);
         }
         else moon.SetActive(false);
