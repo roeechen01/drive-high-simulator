@@ -80,13 +80,13 @@ public class Radio : MonoBehaviour
 
     void RepeatVolUp()
     {
-        if (!IsInvoking("VolUp") && !IsInvoking("VolDown"))
+        if (!IsInvoking("VolUp") && !IsInvoking("VolDown") && !fadingOut)
             InvokeRepeating("VolUp", 0f, 0.1f);
     }
 
     void RepeatVolDown()
     {
-        if (!IsInvoking("VolUp") && !IsInvoking("VolDown"))
+        if (!IsInvoking("VolUp") && !IsInvoking("VolDown") && !fadingOut)
             InvokeRepeating("VolDown", 0f, 0.1f);
     }
 
@@ -222,6 +222,8 @@ public class Radio : MonoBehaviour
 
     void Update()
     {
+        if ((clockTime == 257 || clockTime == 977) && !fadingOut)
+            StartFadeOut();
         if (clockTime == 260 || clockTime == 980)
         {
             clockText.enabled = true;
@@ -235,15 +237,35 @@ public class Radio : MonoBehaviour
             radio.volume = 1f;
     }
 
-    float oldVolume;
+    float oldVolume = 1f;
     bool respecting = false, wasOnThis420 = false;
+
+    float volDec;
+    bool fadingOut = false;
+    void StartFadeOut()
+    {
+        fadingOut = true;
+        oldVolume = radio.volume;
+        volDec = radio.volume / 30f;
+        InvokeRepeating("DecVol", 0.1f, 0.1f);
+        Invoke("FadeOutEnd", 3f);
+    }
+    void DecVol()
+    {
+        radio.volume -= volDec;
+    }
+
+    void FadeOutEnd()
+    {
+        CancelInvoke("DecVol");
+        fadingOut = false;
+    }
     void PlayRespect()
     {
         if (!CinematicMode.active)
             FindObjectOfType<Weed>().SetJointStuffIfNotSet();
         wasOnThis420 = true;
         respecting = true;
-        oldVolume = radio.volume;
         radio.Stop();
         radio.volume = 1f;
         radio.time = 0f;
