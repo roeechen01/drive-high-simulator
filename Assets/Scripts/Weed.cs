@@ -444,4 +444,12 @@ public class Weed : MonoBehaviour
         joint.transform.localPosition += new Vector3(jointSpeed, -jointSpeed, jointSpeed / 10);
     }
 
+    public void SetJointStuffIfNotSet()
+    {
+        if (!squareOn)
+            ToggleJoint();
+        else
+            if (!clipperUsed)
+            LightClipper();
+    }
 }
